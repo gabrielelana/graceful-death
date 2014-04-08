@@ -1,0 +1,10 @@
+{
+  "name": "gabrielelana/sweet-death",
+  "description": "Let PHP processes die with dignity when fatal error occurs",
+  "license": "MIT",
+  "authors": [{
+    "name": "Gabriele Lana",
+    "email": "gabriele.lana@gmail.com"
+  }],
+  "require": { }
+}

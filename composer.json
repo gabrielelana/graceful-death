@@ -9,6 +9,9 @@
     "name": "Gabriele Lana",
     "email": "gabriele.lana@gmail.com"
   }],
+  "autoload": {
+    "classmap": ["src"]
+  },
   "require": { },
   "require-dev": {
     "phpunit/phpunit": "~4.0"

@@ -1,6 +1,9 @@
 {
   "name": "gabrielelana/graceful-death",
   "description": "Let PHP processes die with dignity when fatal error occurs",
+  "type": "library",
+  "keywords": ["system", "processes", "die", "fatal error", "fail over"],
+  "homepage": "https://github.com/gabrielelana/graceful-death",
   "license": "MIT",
   "authors": [{
     "name": "Gabriele Lana",

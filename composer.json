@@ -1,5 +1,5 @@
 {
-  "name": "gabrielelana/sweet-death",
+  "name": "gabrielelana/graceful-death",
   "description": "Let PHP processes die with dignity when fatal error occurs",
   "license": "MIT",
   "authors": [{

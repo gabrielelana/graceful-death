@@ -36,6 +36,11 @@ class GracefulDeath
                     $exitStatusOfLastChild, $lifeCounter, $outputPrintedByLastChild
                 );
             } else {
+                // If you are thinking that this is an hack of an hack you are right...
+                // The fact is that what works for STDOUT doesn't work for STDERR...
+                // We are forced to merge the STDERR to the STDOUT of the child process
+                // to be able to capture it from the parent process. Sadly we loose the
+                // distinction between the two
                 fclose(STDOUT);
                 fclose(STDERR);
                 ini_set('display_errors', 'stdout');

@@ -2,4 +2,4 @@
 As you know catching fatal errors in PHP is extremely painful aka nearly impossibile. This is a library that (partially) solves this issue
 
 # Gotcha
-It only works on unix platforms
+It only works on unix platforms. It only works where `pcntl_*` function are available.

@@ -27,6 +27,7 @@ Scenario: you have a piece of code that potentially can trigger a fatal error an
 * An integer: the process will terminate with this integer as status code
 * A string: the string will be printed on standard output (like in this example)
 * A closure: the closure will be executed and its return value will be used as return value of the `run` method
+
 There are a few other method that can be used to configure `GracefulDeath`
 * `afterNaturalDeath`: like `afterViolentDeath` but used to configure an handler that will be called only when no errors are triggered
 * `afterDeath`: used to configure an handler (like `afterViolentDeath` and `afterNaturalDeath`) that will be called after the code passed to `GracefulDeath::around` is terminated

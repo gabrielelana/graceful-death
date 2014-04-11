@@ -33,6 +33,11 @@ class GracefulDeathBuilder
         return $this;
     }
 
+    public function sayGoodbyeToYourLovedOnce($whatToDo)
+    {
+        return $this->afterDeath($whatToDo);
+    }
+
     public function afterDeath($whatToDo)
     {
         $this->afterViolentDeath = $this->toClosure($whatToDo);

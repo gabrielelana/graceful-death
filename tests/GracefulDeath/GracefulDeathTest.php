@@ -2,55 +2,112 @@
 
 class GracefulDeathTest extends GracefulDeathBaseTest
 {
-    public function testCanCatchViolentDeath()
+    public function setUp()
     {
-        $result = GracefulDeath::around(function() {
+        $this->catched = null;
+    }
+
+    public function testAfterViolentDeathWillCatchAViolentDeath()
+    {
+        GracefulDeath::around(function() {
             $this->raiseFatalError();
         })
         ->afterViolentDeath(function($status) {
-            return 'Catched';
+            $this->catched = 'Catched';
         })
         ->run();
 
-        $this->assertEquals('Catched', $result);
+        $this->assertEquals('Catched', $this->catched);
     }
 
-    public function testCanCatchNaturalDeath()
+    public function testAfterNaturalDeathWillCatchANaturalDeath()
     {
-        $result = GracefulDeath::around(function() {
+        GracefulDeath::around(function() {
             $this->doSomethingUnharmful();
         })
         ->afterNaturalDeath(function($status) {
-            return 'Catched';
+            $this->catched = 'Catched';
         })
         ->run();
 
-        $this->assertEquals('Catched', $result);
+        $this->assertEquals('Catched', $this->catched);
     }
 
-    public function testNaturalDeathIsDeath()
+    public function testAfterDeathWillCatchANaturalDeath()
     {
-        $result = GracefulDeath::around(function() {
+        GracefulDeath::around(function() {
             $this->doSomethingUnharmful();
         })
         ->afterDeath(function($status) {
-            return 'Catched';
+            $this->catched = 'Catched';
         })
         ->run();
 
-        $this->assertEquals('Catched', $result);
+        $this->assertEquals('Catched', $this->catched);
     }
 
-    public function testViolentDeathIsDeath()
+    public function testAfterDeathWillCatchAViolentDeath()
+    {
+        GracefulDeath::around(function() {
+            $this->raiseFatalError();
+        })
+        ->afterDeath(function($status) {
+            $this->catched = 'Catched';
+        })
+        ->run();
+
+        $this->assertEquals('Catched', $this->catched);
+    }
+
+    public function testSayGoodbyeToYourLovedOnceIsAnAlisOfAfterDeathIfYouWhatToBeFunny()
+    {
+        GracefulDeath::around(function() {
+            $this->raiseFatalError();
+        })
+        ->sayGoodbyeToYourLovedOnce(function($status) {
+            $this->catched = 'Catched';
+        })
+        ->run();
+
+        $this->assertEquals('Catched', $this->catched);
+    }
+
+    public function testByDefaultAViolentDeathIsIgnored()
+    {
+        GracefulDeath::around(function() {
+            $this->raiseFatalError();
+        })
+        ->run();
+    }
+
+    public function testByDefaultANaturalDeathIsIgnored()
+    {
+        GracefulDeath::around(function() {
+            $this->raiseFatalError();
+        })
+        ->run();
+    }
+
+    public function testAroundWillReturnWhatIsReturnedByTheDeathHandler()
     {
         $result = GracefulDeath::around(function() {
             $this->raiseFatalError();
         })
-        ->afterDeath(function($status) {
-            return 'Catched';
+        ->afterDeath(function() {
+            return 'Valar Morghulis';
         })
         ->run();
 
-        $this->assertEquals('Catched', $result);
+        $this->assertEquals('Valar Morghulis', $result);
+    }
+
+    public function testAroundByDefaultReturnsNull()
+    {
+        $result = GracefulDeath::around(function() {
+            $this->raiseFatalError();
+        })
+        ->run();
+
+        $this->assertNull($result);
     }
 }

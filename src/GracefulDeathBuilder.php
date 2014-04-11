@@ -6,6 +6,7 @@ class GracefulDeathBuilder
     private $afterViolentDeath;
     private $afterNaturalDeath;
     private $reanimationPolicy;
+    private $options;
 
     public function __construct($main)
     {
@@ -13,6 +14,11 @@ class GracefulDeathBuilder
         $this->afterViolentDeath = function($status) {};
         $this->afterNaturalDeath = function($status) {};
         $this->reanimationPolicy = GracefulDeath::DO_NOT_REANIMATE;
+        $this->options = [
+            'captureOutput' => true,
+            'redirectStandardError' => true,
+            'echoOutput' => true,
+        ];
     }
 
     public function afterViolentDeath($whatToDo)
@@ -40,6 +46,24 @@ class GracefulDeathBuilder
         return $this;
     }
 
+    public function doNotCaptureOutput()
+    {
+        $this->options['captureOutput'] = false;
+        return $this;
+    }
+
+    public function doNotEchoOutput()
+    {
+        $this->options['echoOutput'] = false;
+        return $this;
+    }
+
+    public function doNotRedirectStandardError()
+    {
+        $this->options['redirectStandardError'] = false;
+        return $this;
+    }
+
     public function run()
     {
         return (
@@ -47,7 +71,8 @@ class GracefulDeathBuilder
                 $this->main,
                 $this->afterNaturalDeath,
                 $this->afterViolentDeath,
-                $this->reanimationPolicy
+                $this->reanimationPolicy,
+                $this->options
             )
         )->run();
     }

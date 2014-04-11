@@ -6,6 +6,7 @@ class GracefulDeath
     private $afterNaturalDeath;
     private $afterViolentDeath;
     private $reanimationPolicy;
+    private $options;
 
     const DO_NOT_REANIMATE = 0;
     const GIVE_ME_ANOTHER_CHACE = 1;
@@ -15,12 +16,13 @@ class GracefulDeath
         return new GracefulDeathBuilder($main);
     }
 
-    public function __construct($main, $afterNaturalDeath, $afterViolentDeath, $reanimationPolicy)
+    public function __construct($main, $afterNaturalDeath, $afterViolentDeath, $reanimationPolicy, $options)
     {
         $this->main = $main;
         $this->afterNaturalDeath = $afterNaturalDeath;
         $this->afterViolentDeath = $afterViolentDeath;
         $this->reanimationPolicy = $reanimationPolicy;
+        $this->options = $options;
     }
 
     public function run($lifeCounter = 1)
@@ -41,10 +43,14 @@ class GracefulDeath
                 // We are forced to merge the STDERR to the STDOUT of the child process
                 // to be able to capture it from the parent process. Sadly we loose the
                 // distinction between the two
-                fclose(STDOUT);
-                fclose(STDERR);
-                ini_set('display_errors', 'stdout');
-                $STDOUT = fopen($stdoutFilePath, 'wb+');
+                if ($this->options['captureOutput']) {
+                    fclose(STDOUT);
+                    if ($this->options['redirectStandardError']) {
+                        fclose(STDERR);
+                        ini_set('display_errors', 'stdout');
+                    }
+                    $STDOUT = fopen($stdoutFilePath, 'wb+');
+                }
                 call_user_func($this->main, $lifeCounter);
                 exit(0);
             }
@@ -53,7 +59,9 @@ class GracefulDeath
 
     private function afterChildDeathWithStatus($status, $lifeCounter, $output)
     {
-        echo $output;
+        if ($this->options['echoOutput']) {
+            echo $output;
+        }
         if ($status !== 0) {
             if ($this->canTryAnotherTime($status, $lifeCounter, $output)) {
                 return $this->run($lifeCounter + 1);

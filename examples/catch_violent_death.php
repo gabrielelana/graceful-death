@@ -2,7 +2,9 @@
 
 require __DIR__ . "/../vendor/autoload.php";
 
-// The output will be: Yes, I can ;-)
+// The output will be:
+//
+// Yes, I can ;-)
 
 GracefulDeath::around(function() {
     try {

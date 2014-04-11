@@ -121,15 +121,60 @@ class GracefulDeathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Violent', $result);
     }
 
+    public function testChildStandardOutputIsCapturedAndGivenToRetryPolicyForEvaluation()
+    {
+        ob_start();
+        $result = GracefulDeath::around(function($lifeCounter) {
+            echo 'OUTPUT';
+            $this->raiseFatalError();
+        })
+        ->reanimationPolicy(function($status, $lifeCounter, $output) {
+            $this->assertEquals('OUTPUT', $output);
+            return false;
+        })
+        ->run();
+        ob_end_clean();
+    }
+
+    public function testChildStandardOutputIsEchoedOnFatherStandardOutput()
+    {
+        ob_start();
+        $result = GracefulDeath::around(function($lifeCounter) {
+            echo 'OUTPUT';
+            $this->raiseFatalError();
+        })
+        ->run();
+        $outputPrintedFromParent = ob_get_clean();
+
+        $this->assertEquals('OUTPUT', $outputPrintedFromParent);
+    }
+
+    public function testChildStandardErrorIsCapturedAndGivenToRetryPolicyForEvaluation()
+    {
+        ob_start();
+        $result = GracefulDeath::around(function($lifeCounter) {
+            $this->raiseFatalError($doNotReportErrors = false);
+        })
+        ->reanimationPolicy(function($status, $lifeCounter, $output) {
+            $this->assertStringStartsWith('Fatal error:', trim($output));
+            return false;
+        })
+        ->run();
+        ob_end_clean();
+    }
+
+
 
     private function doSomethingUnharmful()
     {
         return 1 + 1;
     }
 
-    private function raiseFatalError()
+    private function raiseFatalError($doNotReportErrors = true)
     {
-        error_reporting(E_ALL ^ E_ERROR);
+        if ($doNotReportErrors) {
+            error_reporting(E_ALL ^ E_ERROR);
+        }
         // Instance an unknown class cause a fatal error
         new UnknownClass();
     }

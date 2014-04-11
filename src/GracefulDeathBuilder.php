@@ -79,8 +79,11 @@ class GracefulDeathBuilder
 
     private function toClosure($whatToDo)
     {
-        if (is_integer($whatToDo) || is_string($whatToDo)) {
+        if (is_integer($whatToDo)) {
             return function() use($whatToDo) { exit($whatToDo); };
+        }
+        if (is_string($whatToDo)) {
+            return function() use($whatToDo) { echo $whatToDo; };
         }
         if (is_array($whatToDo) && count($whatToDo) === 2) {
             list($status, $message) = $whatToDo;

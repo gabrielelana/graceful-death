@@ -78,15 +78,15 @@ class GracefulDeathTest extends \PHPUnit_Framework_TestCase
 
     public function testCanBeReanimatedMoreThanOneTime()
     {
-        $failUntilTime = 4;
-        $result = GracefulDeath::around(function($lifeCounter) use($failUntilTime) {
-            if ($lifeCounter < $failUntilTime) {
+        $numberOfRetry = 4;
+        $result = GracefulDeath::around(function($lifeCounter) use($numberOfRetry) {
+            if ($lifeCounter < $numberOfRetry) {
                 $this->raiseFatalError();
             } else {
                 $this->doSomethingUnharmful();
             }
         })
-        ->reanimationPolicy($failUntilTime)
+        ->reanimationPolicy($numberOfRetry)
         ->afterViolentDeath(function($status) {
             return 'Violent';
         })
@@ -107,7 +107,7 @@ class GracefulDeathTest extends \PHPUnit_Framework_TestCase
                 $this->raiseFatalError();
             }
         })
-        ->reanimationPolicy(function($status) {
+        ->reanimationPolicy(function($status, $lifeCounter, $output) {
             return $status === 5;
         })
         ->afterViolentDeath(function($status) {
@@ -124,7 +124,7 @@ class GracefulDeathTest extends \PHPUnit_Framework_TestCase
     public function testChildStandardOutputIsCapturedAndGivenToRetryPolicyForEvaluation()
     {
         ob_start();
-        $result = GracefulDeath::around(function($lifeCounter) {
+        GracefulDeath::around(function() {
             echo 'OUTPUT';
             $this->raiseFatalError();
         })
@@ -139,7 +139,7 @@ class GracefulDeathTest extends \PHPUnit_Framework_TestCase
     public function testChildStandardOutputIsEchoedOnFatherStandardOutput()
     {
         ob_start();
-        $result = GracefulDeath::around(function($lifeCounter) {
+        GracefulDeath::around(function() {
             echo 'OUTPUT';
             $this->raiseFatalError();
         })
@@ -152,7 +152,7 @@ class GracefulDeathTest extends \PHPUnit_Framework_TestCase
     public function testChildStandardErrorIsCapturedAndGivenToRetryPolicyForEvaluation()
     {
         ob_start();
-        $result = GracefulDeath::around(function($lifeCounter) {
+        GracefulDeath::around(function() {
             $this->raiseFatalError($doNotReportErrors = false);
         })
         ->reanimationPolicy(function($status, $lifeCounter, $output) {

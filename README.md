@@ -1,7 +1,7 @@
 # Graceful Death [![Build Status](https://travis-ci.org/gabrielelana/graceful-death.svg?branch=master)](https://travis-ci.org/gabrielelana/graceful-death)
 As you may know, catching fatal errors in PHP is extremely painful aka nearly impossibile. This is a library that (partially) solves this issue
 
-# Usage
+## Usage
 ```php
 <?php
 
@@ -35,8 +35,15 @@ There are a few other method that can be used to configure `GracefulDeath`
   * A closure: if the closure returns true the code will be executed again
 For all the options and methods look at the examples or at the tests :smile:
 
-# How Does It Work?
+## How Does It Work?
 When `run` is called the process forks, the child process will execute the code passed to `GracefulDeath::around`, the parent process will act as a supervisor of the child. The supervisor will wait until the child death and will act accordingly to the exit status and the given configuration.
 
-# Gotcha
+## Gotcha
 It only works on unix platforms. It only works where `pcntl_*` function are available.
+
+## Self-Promotion
+If you like this project, then consider to:
+* Star the repository on [GitHub](https://github.com/gabrielelana/graceful-death)
+* Follow me on
+  * [Twitter](http://twitter.com/gabrielelana)
+  * [GitHub](https://github.com/gabrielelana)

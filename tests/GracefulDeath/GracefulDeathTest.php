@@ -64,7 +64,7 @@ class GracefulDeathTest extends \PHPUnit_Framework_TestCase
                 $this->doSomethingUnharmful();
             }
         })
-        ->reanimationPolicy(GracefulDeath::GIVE_ME_ANOTHER_CHACE)
+        ->reanimationPolicy(GracefulDeath::GIVE_ME_ANOTHER_CHANCE)
         ->afterViolentDeath(function($status) {
             return 'Violent';
         })

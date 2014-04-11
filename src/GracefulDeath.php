@@ -33,7 +33,7 @@ class GracefulDeath
             if ($pid) {
                 pcntl_waitpid($pid, $status);
                 $exitStatusOfLastChild = pcntl_wexitstatus($status);
-                $outputPrintedByLastChild = file_get_contents($stdoutFilePath);
+                $outputPrintedByLastChild = $this->outputPrintedByLastChild($stdoutFilePath);
                 return $this->afterChildDeathWithStatus(
                     $exitStatusOfLastChild, $lifeCounter, $outputPrintedByLastChild
                 );
@@ -77,5 +77,12 @@ class GracefulDeath
             return call_user_func($this->reanimationPolicy, $status, $lifeCounter, $output);
         }
         return $this->reanimationPolicy >= $lifeCounter;
+    }
+
+    private function outputPrintedByLastChild($stdoutFilePath)
+    {
+        $output = file_get_contents($stdoutFilePath);
+        @unlink($stdoutFilePath);
+        return $output;
     }
 }

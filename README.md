@@ -1,5 +1,5 @@
 # Graceful Death [![Build Status](https://travis-ci.org/gabrielelana/graceful-death.svg?branch=master)](https://travis-ci.org/gabrielelana/graceful-death)
-As you may know, catching fatal errors in PHP is extremely painful aka nearly impossibile. This is a library that (partially) solves this issue
+As you may know, catching fatal errors in PHP is extremely painful aka nearly impossible. This is a library that (partially) solves this issue
 
 ## Usage
 ```php

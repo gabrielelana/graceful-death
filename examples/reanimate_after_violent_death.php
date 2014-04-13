@@ -15,7 +15,7 @@ require __DIR__ . "/../vendor/autoload.php";
 $startAt = time();
 GracefulDeath::around(function() {
     echo "I will live forever!!!\n";
-    // Let's preted to do something useful :-)
+    // Let's pretend to do something useful :-)
     usleep(50000);
     // Avoid to print the error in order to have clean output, don't try this at home :-)
     error_reporting(E_ALL ^ E_ERROR);

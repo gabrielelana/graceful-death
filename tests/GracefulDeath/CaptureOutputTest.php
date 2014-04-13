@@ -1,6 +1,6 @@
 <?php
 
-class CaptureOutpuTest extends GracefulDeathBaseTest
+class CaptureOutputTest extends GracefulDeathBaseTest
 {
     public function testChildStandardOutputIsCapturedAndGivenToRetryPolicyForEvaluation()
     {

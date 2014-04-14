@@ -4,7 +4,7 @@ class GracefulDeathTest extends GracefulDeathBaseTest
 {
     public function setUp()
     {
-        $this->catched = null;
+        $this->caught = null;
     }
 
     public function testAfterViolentDeathWillCatchAViolentDeath()
@@ -13,11 +13,11 @@ class GracefulDeathTest extends GracefulDeathBaseTest
             $this->raiseFatalError();
         })
         ->afterViolentDeath(function($status) {
-            $this->catched = 'Catched';
+            $this->caught = 'Caught';
         })
         ->run();
 
-        $this->assertEquals('Catched', $this->catched);
+        $this->assertEquals('Caught', $this->caught);
     }
 
     public function testAfterNaturalDeathWillCatchANaturalDeath()
@@ -26,11 +26,11 @@ class GracefulDeathTest extends GracefulDeathBaseTest
             $this->doSomethingUnharmful();
         })
         ->afterNaturalDeath(function($status) {
-            $this->catched = 'Catched';
+            $this->caught = 'Caught';
         })
         ->run();
 
-        $this->assertEquals('Catched', $this->catched);
+        $this->assertEquals('Caught', $this->caught);
     }
 
     public function testAfterDeathWillCatchANaturalDeath()
@@ -39,11 +39,11 @@ class GracefulDeathTest extends GracefulDeathBaseTest
             $this->doSomethingUnharmful();
         })
         ->afterDeath(function($status) {
-            $this->catched = 'Catched';
+            $this->caught = 'Caught';
         })
         ->run();
 
-        $this->assertEquals('Catched', $this->catched);
+        $this->assertEquals('Caught', $this->caught);
     }
 
     public function testAfterDeathWillCatchAViolentDeath()
@@ -52,11 +52,11 @@ class GracefulDeathTest extends GracefulDeathBaseTest
             $this->raiseFatalError();
         })
         ->afterDeath(function($status) {
-            $this->catched = 'Catched';
+            $this->caught = 'Caught';
         })
         ->run();
 
-        $this->assertEquals('Catched', $this->catched);
+        $this->assertEquals('Caught', $this->caught);
     }
 
     public function testSayGoodbyeToYourLovedOnceIsAnAlisOfAfterDeathIfYouWhatToBeFunny()
@@ -65,11 +65,11 @@ class GracefulDeathTest extends GracefulDeathBaseTest
             $this->raiseFatalError();
         })
         ->sayGoodbyeToYourLovedOnce(function($status) {
-            $this->catched = 'Catched';
+            $this->caught = 'Caught';
         })
         ->run();
 
-        $this->assertEquals('Catched', $this->catched);
+        $this->assertEquals('Caught', $this->caught);
     }
 
     public function testByDefaultAViolentDeathIsIgnored()

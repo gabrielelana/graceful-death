@@ -34,6 +34,7 @@ There are a few other method that can be used to configure `GracefulDeath`
 * `reanimationPolicy`: used to configure the reanimation policy aka something that will be used to decide if the code passed to `GracefulDeath::around` should be executed again after a fatal error. The reanimation policy could be
   * An integer: the number of times the code will be executed. The code will not be execute again if either the code terminates without error or the number of executions exceeds the number passed as argument
   * A closure: if the closure returns true the code will be executed again
+
 For all the options and methods look at the examples or at the tests :smile:
 
 ## How Does It Work?

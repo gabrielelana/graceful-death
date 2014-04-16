@@ -27,6 +27,7 @@ class GracefulDeath
 
     public function run($lifeCounter = 1)
     {
+        $this->catchAndIgnoreSignals();
         $stdoutFilePath = tempnam(sys_get_temp_dir(), 'death');
         $pid = pcntl_fork();
         if ($pid >= 0) {
@@ -34,6 +35,7 @@ class GracefulDeath
                 pcntl_waitpid($pid, $status);
                 $exitStatusOfLastChild = pcntl_wexitstatus($status);
                 $outputPrintedByLastChild = $this->outputPrintedByLastChild($stdoutFilePath);
+                /* echo "CHILD EXIT WITH STATUS {$exitStatusOfLastChild}\n"; */
                 return $this->afterChildDeathWithStatus(
                     $exitStatusOfLastChild, $lifeCounter, $outputPrintedByLastChild
                 );
@@ -84,5 +86,14 @@ class GracefulDeath
         $output = file_get_contents($stdoutFilePath);
         @unlink($stdoutFilePath);
         return $output;
+    }
+
+    private function catchAndIgnoreSignals()
+    {
+        foreach ($this->options['catchAndIgnoreSignals'] as $signal) {
+            pcntl_signal($signal, function($signal) {
+                // catch but do nothing
+            });
+        }
     }
 }

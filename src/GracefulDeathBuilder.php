@@ -18,6 +18,7 @@ class GracefulDeathBuilder
             'captureOutput' => true,
             'redirectStandardError' => true,
             'echoOutput' => true,
+            'catchAndIgnoreSignals' => [],
         ];
     }
 
@@ -66,6 +67,16 @@ class GracefulDeathBuilder
     public function doNotRedirectStandardError()
     {
         $this->options['redirectStandardError'] = false;
+        return $this;
+    }
+
+    public function catchAndIgnoreSignals($signals)
+    {
+        if (!is_array($signals)) $signals = [$signals];
+        $signals = array_filter($signals, function($signal) {
+            return is_integer($signal);
+        });
+        $this->options['catchAndIgnoreSignals'] = $signals;
         return $this;
     }
 

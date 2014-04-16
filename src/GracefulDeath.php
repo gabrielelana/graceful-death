@@ -28,14 +28,18 @@ class GracefulDeath
     public function run($lifeCounter = 1)
     {
         $this->catchAndIgnoreSignals();
+        /* $this->lastWill->prepareToRecord(); */
         $stdoutFilePath = tempnam(sys_get_temp_dir(), 'death');
         $pid = pcntl_fork();
         if ($pid >= 0) {
             if ($pid) {
                 pcntl_waitpid($pid, $status);
                 $exitStatusOfLastChild = pcntl_wexitstatus($status);
+                /* $this->lastWill->stop(); */
+                /* $this->lastWill->recordedOnStandardOutput(); */
+                /* $this->lastWill->recordedOnStandardError(); */
+                /* $this->lastWill->replay(); */
                 $outputPrintedByLastChild = $this->outputPrintedByLastChild($stdoutFilePath);
-                /* echo "CHILD EXIT WITH STATUS {$exitStatusOfLastChild}\n"; */
                 return $this->afterChildDeathWithStatus(
                     $exitStatusOfLastChild, $lifeCounter, $outputPrintedByLastChild
                 );
@@ -53,6 +57,7 @@ class GracefulDeath
                     }
                     $STDOUT = fopen($stdoutFilePath, 'wb+');
                 }
+                /* $this->lastWill->record(); */
                 call_user_func($this->main, $lifeCounter);
                 exit(0);
             }

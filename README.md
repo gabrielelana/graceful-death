@@ -5,9 +5,11 @@ As you may know, catching fatal errors in PHP is extremely painful aka nearly im
 ```php
 <?php
 
-require __DIR__ . "/../vendor/autoload.php";
+require __DIR__ . "/vendor/autoload.php";
 
-// The output will be: Yes, I can ;-)
+// The output will be:
+//
+// Yes, I can ;-)
 
 GracefulDeath::around(function() {
     try {

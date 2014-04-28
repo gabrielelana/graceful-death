@@ -15,9 +15,8 @@ class GracefulDeathBuilder
         $this->afterNaturalDeath = function($status) {};
         $this->reanimationPolicy = GracefulDeath::DO_NOT_REANIMATE;
         $this->options = [
-            'captureOutput' => true,
-            'redirectStandardError' => true,
             'echoOutput' => true,
+            'captureOutput' => true,
             'catchAndIgnoreSignals' => [],
         ];
     }
@@ -61,12 +60,6 @@ class GracefulDeathBuilder
     public function doNotEchoOutput()
     {
         $this->options['echoOutput'] = false;
-        return $this;
-    }
-
-    public function doNotRedirectStandardError()
-    {
-        $this->options['redirectStandardError'] = false;
         return $this;
     }
 

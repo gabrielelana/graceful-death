@@ -26,7 +26,6 @@ class LastWill
     {
         if (!$this->options['captureOutput']) return;
         $this->redirectStdout();
-        if (!$this->options['redirectStandardError']) return;
         $this->redirectStderr();
     }
 

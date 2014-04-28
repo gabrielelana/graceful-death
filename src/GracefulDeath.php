@@ -38,10 +38,10 @@ class GracefulDeath
                 /* $this->lastWill->recordedOnStandardOutput(); */
                 /* $this->lastWill->recordedOnStandardError(); */
                 /* $this->lastWill->replay(); */
-                $outputPrintedByLastChild = $this->outputPrintedByLastChild($lastWill->stdoutFilePath);
-                return $this->afterChildDeathWithStatus(
-                    $exitStatusOfLastChild, $lifeCounter, $outputPrintedByLastChild
-                );
+                /* $lastWill->stop(); */
+                $lastWill->stop();
+                /* $outputPrintedByLastChild = $lastWill->outputPrintedByLastChild(); */
+                return $this->afterChildDeathWithStatus($exitStatusOfLastChild, $lifeCounter, $lastWill);
             } else {
                 // If you are thinking that this is an hack of an hack you are right...
                 // The fact is that what works for STDOUT doesn't work for STDERR...
@@ -63,13 +63,11 @@ class GracefulDeath
         }
     }
 
-    private function afterChildDeathWithStatus($status, $lifeCounter, $output)
+    private function afterChildDeathWithStatus($status, $lifeCounter, $lastWill)
     {
-        if ($this->options['echoOutput']) {
-            echo $output;
-        }
+        $lastWill->play();
         if ($status !== 0) {
-            if ($this->canTryAnotherTime($status, $lifeCounter, $output)) {
+            if ($this->canTryAnotherTime($status, $lifeCounter, $lastWill)) {
                 return $this->run($lifeCounter + 1);
             }
             return call_user_func($this->afterViolentDeath, $status);
@@ -77,19 +75,14 @@ class GracefulDeath
         return call_user_func($this->afterNaturalDeath, $status);
     }
 
-    private function canTryAnotherTime($status, $lifeCounter, $output)
+    private function canTryAnotherTime($status, $lifeCounter, $lastWill)
     {
         if (is_callable($this->reanimationPolicy)) {
-            return call_user_func($this->reanimationPolicy, $status, $lifeCounter, $output);
+            return call_user_func($this->reanimationPolicy,
+                $status, $lifeCounter, $lastWill->whatDidHeSayOnStdout()
+            );
         }
         return $this->reanimationPolicy >= $lifeCounter;
-    }
-
-    private function outputPrintedByLastChild($stdoutFilePath)
-    {
-        $output = file_get_contents($stdoutFilePath);
-        @unlink($stdoutFilePath);
-        return $output;
     }
 
     private function catchAndIgnoreSignals()

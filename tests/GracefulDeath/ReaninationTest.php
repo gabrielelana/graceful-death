@@ -68,18 +68,4 @@ class ReanimationTest extends GracefulDeathBaseTest
 
         $this->assertEquals('Violent', $result);
     }
-
-    protected function doSomethingUnharmful()
-    {
-        return 1 + 1;
-    }
-
-    protected function raiseFatalError($doNotReportErrors = true)
-    {
-        if ($doNotReportErrors) {
-            error_reporting(E_ALL ^ E_ERROR);
-        }
-        // Instance an unknown class cause a fatal error
-        new UnknownClass();
-    }
 }

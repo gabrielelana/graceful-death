@@ -25,7 +25,7 @@ GracefulDeath::around(function() {
 ->afterViolentDeath("Yes, I can ;-)\n")
 ->run();
 ```
-Scenario: you have a piece of code that potentially can trigger a fatal error and you want to be able to clean up after it or retry it with some policy. With `GracefulDeath` you can put this piece of code in a closure and pass it as a parameter to the `GracefulDeath::around` static method. This static method returns an instance of a builder that let you configure how `GracefulDeath` will behave. With `afterViolentDeath` you can configure an handler that will be called whenever a fatal error is triggered. An handler could be
+Scenario: you have a piece of code that potentially can trigger a fatal error and you want to be able to clean up after it or retry it with some policy. With `GracefulDeath` you can put this piece of code in a closure and pass it as a parameter to the `GracefulDeath::around` static method. This static method returns an instance of a builder that let you configure how `GracefulDeath` will behave. With `afterViolentDeath` you can configure an handler that will be called whenever a fatal error is triggered. The handler could be
 * An integer: the process will terminate with this integer as status code
 * A string: the string will be printed on standard output (like in this example)
 * A closure: the closure will be executed and its return value will be used as return value of the `run` method
@@ -35,7 +35,13 @@ There are a few other method that can be used to configure `GracefulDeath`
 * `afterDeath`: used to configure an handler (like `afterViolentDeath` and `afterNaturalDeath`) that will be called after the code passed to `GracefulDeath::around` is terminated
 * `reanimationPolicy`: used to configure the reanimation policy aka something that will be used to decide if the code passed to `GracefulDeath::around` should be executed again after a fatal error. The reanimation policy could be
   * An integer: the number of times the code will be executed. The code will not be execute again if either the code terminates without error or the number of executions exceeds the number passed as argument
-  * A closure: if the closure returns true the code will be executed again
+  * A closure: if the closure returns true the code will be executed again. The closure signature is `function($status, $lifeCounter, $stdout, $stderr)`
+    * `$status`: the exit status of the code passed to `GracefulDeath::around`
+    * `$lifeCounter`: how many times the code is executed, starts at `1`
+    * `$stdout`: what the code passed to `GracefulDeath::around` printed on `stdout`
+    * `$stderr`: what the code passed to `GracefulDeath::around` printed on `stderr`
+* `doNotCaptureOutput`: avoid to capture `stdout` and `stderr`. Note that if output is not captured then it could not be given to the `reanimationPolicy` closure
+* `doNotEchoOutput`: discard the possibly captured output
 
 For all the options and methods look at the examples or at the tests :smile:
 

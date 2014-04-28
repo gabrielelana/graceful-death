@@ -102,6 +102,9 @@ class GracefulDeathBuilder
             return function() use($whatToDo) { echo $whatToDo; };
         }
         if (is_array($whatToDo) && count($whatToDo) === 2) {
+            if (is_object($whatToDo[0])) {
+                return $whatToDo;
+            }
             list($status, $message) = $whatToDo;
             return function() use($status, $message) {
                 echo $message;

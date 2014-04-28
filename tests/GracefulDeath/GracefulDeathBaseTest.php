@@ -15,4 +15,10 @@ abstract class GracefulDeathBaseTest extends \PHPUnit_Framework_TestCase
         // Instance an unknown class cause a fatal error
         new UnknownClass();
     }
+
+    protected function willBeCalled($howManyTimes) {
+        $mock = $this->getMock('stdClass', array('aCallback'));
+        $mock->expects($howManyTimes)->method('aCallback')->will($this->returnValue(true));
+        return [$mock, 'aCallback'];
+    }
 }

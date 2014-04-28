@@ -34,29 +34,10 @@ class GracefulDeath
             if ($pid) {
                 pcntl_waitpid($pid, $status);
                 $exitStatusOfLastChild = pcntl_wexitstatus($status);
-                /* $this->lastWill->stop(); */
-                /* $this->lastWill->recordedOnStandardOutput(); */
-                /* $this->lastWill->recordedOnStandardError(); */
-                /* $this->lastWill->replay(); */
-                /* $lastWill->stop(); */
                 $lastWill->stop();
-                /* $outputPrintedByLastChild = $lastWill->outputPrintedByLastChild(); */
                 return $this->afterChildDeathWithStatus($exitStatusOfLastChild, $lifeCounter, $lastWill);
             } else {
-                // If you are thinking that this is an hack of an hack you are right...
-                // The fact is that what works for STDOUT doesn't work for STDERR...
-                // We are forced to merge the STDERR to the STDOUT of the child process
-                // to be able to capture it from the parent process. Sadly we loose the
-                // distinction between the two
-                if ($this->options['captureOutput']) {
-                    fclose(STDOUT);
-                    if ($this->options['redirectStandardError']) {
-                        fclose(STDERR);
-                        ini_set('display_errors', 'stdout');
-                    }
-                    $STDOUT = fopen($lastWill->stdoutFilePath, 'wb+');
-                }
-                /* $this->lastWill->record(); */
+                $lastWill->capture();
                 call_user_func($this->main, $lifeCounter);
                 exit(0);
             }

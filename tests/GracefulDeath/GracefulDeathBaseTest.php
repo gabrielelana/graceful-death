@@ -26,7 +26,7 @@ abstract class GracefulDeathBaseTest extends \PHPUnit_Framework_TestCase
         return [$mock, 'aCallback'];
     }
 
-    protected function runFixture($fixture, $callback)
+    protected function runFixture($fixture, $callback = null)
     {
         $descriptors = [
             0 => ['pipe', 'r'],
@@ -39,6 +39,8 @@ abstract class GracefulDeathBaseTest extends \PHPUnit_Framework_TestCase
         $stderr = stream_get_contents($pipes[2]);
         fclose($pipes[1]);
         fclose($pipes[2]);
-        $callback($stdout, $stderr);
+        if ($callback) {
+            $callback($stdout, $stderr);
+        }
     }
 }

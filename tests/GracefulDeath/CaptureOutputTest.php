@@ -18,6 +18,22 @@ class CaptureOutputTest extends GracefulDeathBaseTest
         });
     }
 
+    public function testErrorsAreNotPrintToStderrWhenDisplayErrorsIsFalse()
+    {
+        $this->runFixture('doNotPrintErrorsByConfiguration.php', function($stdout, $stderr) {
+            $this->assertEmpty($stdout);
+            $this->assertEmpty($stderr);
+        });
+    }
+
+    public function testErrorsAreStillLoggedWhenErrorLogIsEnabled()
+    {
+        $stderrFilePath = tempnam(sys_get_temp_dir(), 'death');
+        $this->runFixture("printOutputOnErrorLog.php --where {$stderrFilePath}");
+        $this->assertNotEmpty(file_get_contents($stderrFilePath));
+        @unlink($stderrFilePath);
+    }
+
     public function testCouldAvoidToPrintChildOutputWithOption()
     {
         $this->runFixture('doNotEchoOutput.php', function($stdout, $stderr) {

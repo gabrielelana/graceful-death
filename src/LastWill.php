@@ -19,12 +19,12 @@ class LastWill
         $this->capturedFromStderr = '';
         $this->userSettings = [];
         $this->userSettingsToSave = ['error_log', 'log_errors', 'display_errors'];
+        $this->saveUserSettings();
     }
 
     public function capture()
     {
         if (!$this->options['captureOutput']) return;
-        $this->saveUserSettings();
         $this->redirectStdout();
         if (!$this->options['redirectStandardError']) return;
         $this->redirectStderr();
@@ -46,8 +46,32 @@ class LastWill
     public function play()
     {
         if (!$this->options['echoOutput']) return;
+        $this->playCapturedStdoutOnStdout();
+        $this->playCapturedStderrOnStderr();
+        $this->playCapturedStderrOnErrorLog();
+    }
+
+    private function playCapturedStdoutOnStdout()
+    {
         file_put_contents('php://stdout', $this->capturedFromStdout);
-        file_put_contents('php://stderr', $this->capturedFromStderr);
+    }
+
+    private function playCapturedStderrOnStderr()
+    {
+        if ($this->userSettings['display_errors']) {
+            file_put_contents('php://stderr', $this->capturedFromStderr);
+        }
+    }
+
+    private function playCapturedStderrOnErrorLog()
+    {
+        if ($this->userSettings['log_errors'] && $this->userSettings['error_log']) {
+            $handle = fopen($this->userSettings['error_log'], 'a');
+            if ($handle) {
+                fwrite($handle, $this->capturedFromStderr);
+                fclose($handle);
+            }
+        }
     }
 
     public function whatDidHeSayOnStdout()

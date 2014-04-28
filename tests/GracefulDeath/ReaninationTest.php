@@ -3,25 +3,29 @@
 
 class ReanimationTest extends GracefulDeathBaseTest
 {
+    public function testAroundClosureTakesLifeCounter()
+    {
+        GracefulDeath::around(function($lifeCounter) {
+            if ($lifeCounter !== 1) {
+                $this->raiseFatalError();
+            }
+        })
+        ->afterNaturalDeath($this->willBeCalled($this->once()))
+        ->run();
+    }
+
     public function testCanBeReanimatedOneTime()
     {
-        $result = GracefulDeath::around(function($lifeCounter) {
+        GracefulDeath::around(function($lifeCounter) {
             if ($lifeCounter === 1) {
+                // It will raise a fatal error only the first execution
                 $this->raiseFatalError();
-            } else {
-                $this->doSomethingUnharmful();
             }
         })
         ->reanimationPolicy(GracefulDeath::GIVE_ME_ANOTHER_CHANCE)
-        ->afterViolentDeath(function($status) {
-            return 'Violent';
-        })
-        ->afterNaturalDeath(function($status) {
-            return 'Natural';
-        })
+        ->afterNaturalDeath($this->willBeCalled($this->once()))
+        ->afterViolentDeath($this->willBeCalled($this->never()))
         ->run();
-
-        $this->assertEquals('Natural', $result);
     }
 
     public function testCanBeReanimatedMoreThanOneTime()
@@ -29,43 +33,30 @@ class ReanimationTest extends GracefulDeathBaseTest
         $numberOfRetry = 4;
         $result = GracefulDeath::around(function($lifeCounter) use($numberOfRetry) {
             if ($lifeCounter < $numberOfRetry) {
+                // It will raise a fatal error only the first $numberOfRetry times
                 $this->raiseFatalError();
-            } else {
-                $this->doSomethingUnharmful();
             }
+            $this->doSomethingUnharmful();
         })
         ->reanimationPolicy($numberOfRetry)
-        ->afterViolentDeath(function($status) {
-            return 'Violent';
-        })
-        ->afterNaturalDeath(function($status) {
-            return 'Natural';
-        })
+        ->afterNaturalDeath($this->willBeCalled($this->once()))
+        ->afterViolentDeath($this->willBeCalled($this->never()))
         ->run();
-
-        $this->assertEquals('Natural', $result);
     }
 
     public function testCanBeReanimatedWithArbitraryPolicy()
     {
-        $result = GracefulDeath::around(function($lifeCounter) {
+        GracefulDeath::around(function($lifeCounter) {
             if ($lifeCounter < 3) {
                 exit(5);
-            } else {
-                $this->raiseFatalError();
             }
+            $this->doSomethingUnharmful();
         })
         ->reanimationPolicy(function($status, $lifeCounter, $output) {
             return $status === 5;
         })
-        ->afterViolentDeath(function($status) {
-            return 'Violent';
-        })
-        ->afterNaturalDeath(function($status) {
-            return 'Natural';
-        })
+        ->afterNaturalDeath($this->willBeCalled($this->once()))
+        ->afterViolentDeath($this->willBeCalled($this->never()))
         ->run();
-
-        $this->assertEquals('Violent', $result);
     }
 }

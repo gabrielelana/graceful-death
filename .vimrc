@@ -8,6 +8,7 @@ let g:syntastic_mode_map = {'mode': 'active'}
 
 let g:ctrlp_custom_ignore = '\.git$\|\.tmp$\|\.work$\|vendor$'
 
+autocmd Filetype php nnoremap <silent> <buffer> <Leader>a :!vendor/bin/phpunit<CR>
 autocmd Filetype php nnoremap <silent> <buffer> <Leader>o :call OpenCurrentTest()<CR>
 autocmd Filetype php nnoremap <silent> <buffer> <Leader>t
   \ :setlocal nocursorline <BAR> call RunCurrentTest() <BAR> setlocal cursorline<CR>
@@ -71,7 +72,7 @@ function! SearchForRelatedTestFile(file_path)
   let l:file_name=fnamemodify(a:file_path, ":t")
   let l:test_file_name=fnamemodify(l:file_name, ":r") . "Test.php"
   let l:project_root_path=ProjectRootGuess(a:file_path)
-  let l:found=system("find '".l:project_root_path."/spec' -name '".l:test_file_name."'")
+  let l:found=system("find '".l:project_root_path."/tests' -name '".l:test_file_name."'")
   let l:number_of_file_founds=strlen(substitute(l:found, "[^\n]", "", "g"))
   if l:number_of_file_founds == 1
     return l:found

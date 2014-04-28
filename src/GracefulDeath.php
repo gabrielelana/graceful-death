@@ -60,7 +60,9 @@ class GracefulDeath
     {
         if (is_callable($this->reanimationPolicy)) {
             return call_user_func($this->reanimationPolicy,
-                $status, $lifeCounter, $lastWill->whatDidHeSayOnStdout()
+                $status, $lifeCounter,
+                $lastWill->whatDidHeSayOnStdout(),
+                $lastWill->whatDidHeSayOnStderr()
             );
         }
         return $this->reanimationPolicy >= $lifeCounter;

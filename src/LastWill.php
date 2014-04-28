@@ -3,8 +3,12 @@
 class LastWill
 {
     private $options;
+    private $stdoutFilePath;
+    private $stderrFilePath;
     private $capturedFromStdout;
     private $capturedFromStderr;
+    private $userSettings;
+    private $userSettingsToSave;
 
     public function __construct($options)
     {
@@ -13,36 +17,37 @@ class LastWill
         $this->stderrFilePath = tempnam(sys_get_temp_dir(), 'death');
         $this->capturedFromStdout = '';
         $this->capturedFromStderr = '';
+        $this->userSettings = [];
+        $this->userSettingsToSave = ['error_log', 'log_errors', 'display_errors'];
     }
 
     public function capture()
     {
-        // If you are thinking that this is an hack of an hack you are right...
-        // The fact is that what works for STDOUT doesn't work for STDERR...
-        // We are forced to merge the STDERR to the STDOUT of the child process
-        // to be able to capture it from the parent process. Sadly we loose the
-        // distinction between the two
-        global $STDOUT;
-        if ($this->options['captureOutput']) {
-            fclose(STDOUT);
-            if ($this->options['redirectStandardError']) {
-                fclose(STDERR);
-                ini_set('display_errors', 'stdout');
-            }
-            $STDOUT = fopen($this->stdoutFilePath, 'wb+');
-        }
+        if (!$this->options['captureOutput']) return;
+        $this->saveUserSettings();
+        $this->redirectStdout();
+        if (!$this->options['redirectStandardError']) return;
+        $this->redirectStderr();
+    }
+
+    private function removeErrorLogHeaderFromEachLine($content)
+    {
+        return preg_replace('/^\[[^\]]+\]\s(.*)$/m', '\1', $content);
     }
 
     public function stop()
     {
         $this->capturedFromStdout = $this->contentOf($this->stdoutFilePath);
+        $this->capturedFromStderr = $this->removeErrorLogHeaderFromEachLine(
+            $this->contentOf($this->stderrFilePath)
+        );
     }
 
     public function play()
     {
-        if ($this->options['echoOutput']) {
-            echo $this->capturedFromStdout;
-        }
+        if (!$this->options['echoOutput']) return;
+        file_put_contents('php://stdout', $this->capturedFromStdout);
+        file_put_contents('php://stderr', $this->capturedFromStderr);
     }
 
     public function whatDidHeSayOnStdout()
@@ -50,10 +55,36 @@ class LastWill
         return $this->capturedFromStdout;
     }
 
-    private function contentOf()
+    public function whatDidHeSayOnStderr()
     {
-        $output = file_get_contents($this->stdoutFilePath);
-        @unlink($this->stdoutFilePath);
-        return $output;
+        return $this->capturedFromStderr;
+    }
+
+    private function contentOf($filePath)
+    {
+        $content = file_get_contents($filePath);
+        @unlink($filePath);
+        return $content;
+    }
+
+    private function saveUserSettings()
+    {
+        foreach($this->userSettingsToSave as $key) {
+            $this->userSettings[$key] = ini_get($key);
+        }
+    }
+
+    private function redirectStdout()
+    {
+        global $STDOUT;
+        fclose(STDOUT);
+        $STDOUT = fopen($this->stdoutFilePath, 'wb+');
+    }
+
+    private function redirectStderr()
+    {
+        ini_set('error_log', $this->stderrFilePath);
+        ini_set('log_errors', 1);
+        ini_set('display_errors', 0);
     }
 }

@@ -2,45 +2,54 @@
 
 class CaptureOutputTest extends GracefulDeathBaseTest
 {
-    public function testChildStandardOutputIsCapturedAndGivenToRetryPolicyForEvaluation()
-    {
-        ob_start();
-        GracefulDeath::around(function() {
-            echo 'OUTPUT';
-            $this->raiseFatalError();
-        })
-        ->reanimationPolicy(function($status, $lifeCounter, $output) {
-            $this->assertEquals('OUTPUT', $output);
-            return false;
-        })
-        ->run();
-        ob_end_clean();
-    }
-
     public function testChildStandardOutputIsEchoedOnFatherStandardOutput()
     {
-        ob_start();
+        $this->runFixture('printOutputOnStdout.php --what OUTPUT', function($stdout, $stderr) {
+            $this->assertEquals('OUTPUT', $stdout);
+            $this->assertEmpty($stderr);
+        });
+    }
+
+    public function testChildStandardErrorIsEchoedOnFatherStandardError()
+    {
+        $this->runFixture('printOutputOnStderr.php --what OUTPUT', function($stdout, $stderr) {
+            $this->assertEmpty($stdout);
+            $this->assertEquals('OUTPUT', $stderr);
+        });
+    }
+
+    public function testCouldAvoidToPrintChildOutputWithOption()
+    {
+        $this->runFixture('doNotEchoOutput.php', function($stdout, $stderr) {
+            $this->assertEmpty($stdout);
+            $this->assertEmpty($stderr);
+        });
+    }
+
+    public function testChildStandardOutputIsCapturedAndGivenToRetryPolicyForEvaluation()
+    {
         GracefulDeath::around(function() {
-            echo 'OUTPUT';
+            file_put_contents('php://stdout', 'OUTPUT');
             $this->raiseFatalError();
         })
+        ->reanimationPolicy(function($status, $lifeCounter, $stdout, $stderr) {
+            $this->assertEquals('OUTPUT', $stdout);
+            return false;
+        })
+        ->doNotEchoOutput()
         ->run();
-        $outputPrintedFromParent = ob_get_clean();
-
-        $this->assertEquals('OUTPUT', $outputPrintedFromParent);
     }
 
     public function testChildStandardErrorIsCapturedAndGivenToRetryPolicyForEvaluation()
     {
-        ob_start();
         GracefulDeath::around(function() {
-            $this->raiseFatalError($doNotReportErrors = false);
+            $this->raiseAndReportFatalError();
         })
-        ->reanimationPolicy(function($status, $lifeCounter, $output) {
-            $this->assertStringStartsWith('Fatal error:', trim($output));
+        ->reanimationPolicy(function($status, $lifeCounter, $stdout, $stderr) {
+            $this->assertStringStartsWith('PHP Fatal error:', trim($stderr));
             return false;
         })
+        ->doNotEchoOutput()
         ->run();
-        ob_end_clean();
     }
 }

@@ -41,7 +41,7 @@ There are a few other method that can be used to configure `GracefulDeath`
     * `$stdout`: what the code passed to `GracefulDeath::around` printed on `stdout`
     * `$stderr`: what the code passed to `GracefulDeath::around` printed on `stderr`
 * `doNotCaptureOutput`: avoid to capture `stdout` and `stderr`. Note that if output is not captured then it could not be given to the `reanimationPolicy` closure
-* `doNotEchoOutput`: discard the possibly captured output
+* `doNotEchoOutput`: discard the (if any) captured output
 
 For all the options and methods look at the examples or at the tests :smile:
 

@@ -3,7 +3,7 @@
   "description": "Library that let you catch fatal errors",
   "type": "library",
   "version": "0.1.0",
-  "keywords": ["catch", "fatal", "error", "try", "register_shutdown_function"],
+  "keywords": ["catch", "fatal", "error", "try", "die", "cleanup"],
   "homepage": "https://github.com/gabrielelana/graceful-death",
   "license": "MIT",
   "authors": [{

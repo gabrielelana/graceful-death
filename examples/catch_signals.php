@@ -11,10 +11,9 @@ require __DIR__ . "/../vendor/autoload.php";
 // ...
 // Maybe not... :-(
 
+echo "CTRL-C to terminate\n";
+
 GracefulDeath::around(function($life) {
-
-    echo "CTRL-C to terminate\n";
-
     while (!$life->askedToStop()) {
         echo "I will live forever!!!\n";
         // Let's pretend to do something useful :-)

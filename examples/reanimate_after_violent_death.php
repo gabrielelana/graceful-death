@@ -22,7 +22,7 @@ GracefulDeath::around(function() {
     // Creating an instance of an unknown class will cause a fatal error
     new UnknownClass();
 })
-->reanimationPolicy(function($status, $lifeCounter, $output) use($startAt) {
+->reanimationPolicy(function($status, $attempts, $output) use($startAt) {
     return (time() - $startAt) < 5;
 })
 ->afterViolentDeath("Maybe not... :-(\n")

@@ -3,10 +3,10 @@
 
 class ReanimationTest extends GracefulDeathBaseTest
 {
-    public function testAroundClosureTakesLifeCounter()
+    public function testAroundClosureTakesLifeToWhichCanAskHowManyLiveYouHaveLived()
     {
-        GracefulDeath::around(function($lifeCounter) {
-            if ($lifeCounter !== 1) {
+        GracefulDeath::around(function($life) {
+            if ($life->numberOfPreviousLives() > 1) {
                 $this->raiseFatalError();
             }
         })
@@ -16,8 +16,8 @@ class ReanimationTest extends GracefulDeathBaseTest
 
     public function testCanBeReanimatedOneTime()
     {
-        GracefulDeath::around(function($lifeCounter) {
-            if ($lifeCounter === 1) {
+        GracefulDeath::around(function($life) {
+            if ($life->numberOfPreviousLives() === 1) {
                 // It will raise a fatal error only the first execution
                 $this->raiseFatalError();
             }
@@ -31,8 +31,8 @@ class ReanimationTest extends GracefulDeathBaseTest
     public function testCanBeReanimatedMoreThanOneTime()
     {
         $numberOfRetry = 4;
-        $result = GracefulDeath::around(function($lifeCounter) use($numberOfRetry) {
-            if ($lifeCounter < $numberOfRetry) {
+        $result = GracefulDeath::around(function($life) use($numberOfRetry) {
+            if ($life->numberOfPreviousLives() < $numberOfRetry) {
                 // It will raise a fatal error only the first $numberOfRetry times
                 $this->raiseFatalError();
             }
@@ -53,7 +53,7 @@ class ReanimationTest extends GracefulDeathBaseTest
                 $this->raiseFatalError();
             }
         })
-        ->reanimationPolicy(function($status, $lifeCounter, $output) use($startAt) {
+        ->reanimationPolicy(function($status, $attempts, $output) use($startAt) {
             return microtime(true) - $startAt > 2000;
         })
         ->afterNaturalDeath($this->willBeCalled($this->once()))
@@ -64,8 +64,8 @@ class ReanimationTest extends GracefulDeathBaseTest
     public function testCanBeReanimatedForever()
     {
         // It will retry for ever, but after 3 times it will die naturally
-        GracefulDeath::around(function($lifeCounter) {
-            if ($lifeCounter < 3) {
+        GracefulDeath::around(function($life) {
+            if ($life->numberOfPreviousLives() < 3) {
                 exit(5);
             }
             $this->doSomethingUnharmful();

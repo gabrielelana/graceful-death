@@ -36,9 +36,9 @@ There are a few other method that can be used to configure `GracefulDeath`
 * `reanimationPolicy`: used to configure the reanimation policy aka something that will be used to decide if the code passed to `GracefulDeath::around` should be executed again after a fatal error. The reanimation policy could be
   * A boolean: if true it will retry forever, if false it will never retry (default)
   * An integer: the number of times the code will be executed. The code will not be execute again if either the code terminates without error or the number of executions exceeds the number passed as argument
-  * A closure: if the closure returns true the code will be executed again. The closure signature is `function($status, $lifeCounter, $stdout, $stderr)`
+  * A closure: if the closure returns true the code will be executed again. The closure signature is `function($status, $attempts, $stdout, $stderr)`
     * `$status`: the exit status of the code passed to `GracefulDeath::around`
-    * `$lifeCounter`: how many times the code is executed, starts at `1`
+    * `$attempts`: how many times the code is executed, starts at `1`
     * `$stdout`: what the code passed to `GracefulDeath::around` printed on `stdout`
     * `$stderr`: what the code passed to `GracefulDeath::around` printed on `stderr`
 * `doNotCaptureOutput`: avoid to capture `stdout` and `stderr`. Note that if output is not captured then it could not be given to the `reanimationPolicy` closure

@@ -17,7 +17,7 @@ class GracefulDeathBuilder
         $this->options = [
             'echoOutput' => true,
             'captureOutput' => true,
-            'catchAndIgnoreSignals' => [],
+            'catchSignals' => [],
         ];
     }
 
@@ -63,13 +63,13 @@ class GracefulDeathBuilder
         return $this;
     }
 
-    public function catchAndIgnoreSignals($signals)
+    public function catchSignals($signals)
     {
         if (!is_array($signals)) $signals = [$signals];
         $signals = array_filter($signals, function($signal) {
             return is_integer($signal);
         });
-        $this->options['catchAndIgnoreSignals'] = $signals;
+        $this->options['catchSignals'] = $signals;
         return $this;
     }
 

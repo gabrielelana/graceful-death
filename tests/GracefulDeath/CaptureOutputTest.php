@@ -48,7 +48,7 @@ class CaptureOutputTest extends GracefulDeathBaseTest
             file_put_contents('php://stdout', 'OUTPUT');
             $this->raiseFatalError();
         })
-        ->reanimationPolicy(function($status, $lifeCounter, $stdout, $stderr) {
+        ->reanimationPolicy(function($status, $attempts, $stdout, $stderr) {
             $this->assertEquals('OUTPUT', $stdout);
             return false;
         })
@@ -61,7 +61,7 @@ class CaptureOutputTest extends GracefulDeathBaseTest
         GracefulDeath::around(function() {
             $this->raiseAndReportFatalError();
         })
-        ->reanimationPolicy(function($status, $lifeCounter, $stdout, $stderr) {
+        ->reanimationPolicy(function($status, $attempts, $stdout, $stderr) {
             $this->assertStringStartsWith('PHP Fatal error:', trim($stderr));
             return false;
         })

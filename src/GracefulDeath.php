@@ -25,7 +25,7 @@ class GracefulDeath
         $this->options = $options;
     }
 
-    public function run($lifeCounter = 1)
+    public function run($attempts = 1)
     {
         $this->catchAndIgnoreSignals();
         $lastWill = new LastWill($this->options);
@@ -35,12 +35,13 @@ class GracefulDeath
                 pcntl_waitpid($pid, $status);
                 $lastWill->stop();
                 return $this->afterChildDeathWithStatus(
-                    $this->exitStatusOfLastChild($status), $lifeCounter, $lastWill
+                    $this->exitStatusOfLastChild($status), $attempts, $lastWill
                 );
             } else {
+                $life = new Life($attempts);
+                $this->catchSignalsFor($life);
                 $lastWill->capture();
-                call_user_func($this->main, $lifeCounter);
-                exit(0);
+                call_user_func($this->main, $life);
             }
         }
     }
@@ -55,29 +56,29 @@ class GracefulDeath
         return $exitStatusOfLastChild;
     }
 
-    private function afterChildDeathWithStatus($status, $lifeCounter, $lastWill)
+    private function afterChildDeathWithStatus($status, $attempts, $lastWill)
     {
         $lastWill->play();
         if ($status !== 0) {
-            if ($this->canTryAnotherTime($status, $lifeCounter, $lastWill)) {
-                return $this->run($lifeCounter + 1);
+            if ($this->canTryAnotherTime($status, $attempts, $lastWill)) {
+                return $this->run($attempts + 1);
             }
             return call_user_func($this->afterViolentDeath, $status);
         }
         return call_user_func($this->afterNaturalDeath, $status);
     }
 
-    private function canTryAnotherTime($status, $lifeCounter, $lastWill)
+    private function canTryAnotherTime($status, $attempts, $lastWill)
     {
         if (is_callable($this->reanimationPolicy)) {
             return call_user_func($this->reanimationPolicy,
-                $status, $lifeCounter,
+                $status, $attempts,
                 $lastWill->whatDidHeSayOnStdout(),
                 $lastWill->whatDidHeSayOnStderr()
             );
         }
         if (is_numeric($this->reanimationPolicy)) {
-            return $this->reanimationPolicy >= $lifeCounter;
+            return $this->reanimationPolicy >= $attempts;
         }
         if (is_bool($this->reanimationPolicy)) {
             return $this->reanimationPolicy;
@@ -87,9 +88,18 @@ class GracefulDeath
 
     private function catchAndIgnoreSignals()
     {
-        foreach ($this->options['catchAndIgnoreSignals'] as $signal) {
+        foreach ($this->options['catchSignals'] as $signal) {
             pcntl_signal($signal, function($signal) {
                 // catch but do nothing
+            });
+        }
+    }
+
+    private function catchSignalsFor($life)
+    {
+        foreach ($this->options['catchSignals'] as $signal) {
+            pcntl_signal($signal, function($signal) use($life) {
+                $life->sendSignal($signal);
             });
         }
     }

@@ -25,23 +25,31 @@ class GracefulDeath
         $this->options = $options;
     }
 
-    public function run($attempts = 1)
+    public function run()
     {
+        $attempts = 0;
         $this->catchAndIgnoreSignals();
-        $lastWill = new LastWill($this->options);
-        $pid = pcntl_fork();
-        if ($pid >= 0) {
-            if ($pid) {
-                pcntl_waitpid($pid, $status);
-                $lastWill->stop();
-                return $this->afterChildDeathWithStatus(
-                    $this->exitStatusOfLastChild($status), $attempts, $lastWill
-                );
-            } else {
-                $life = new Life($attempts);
-                $this->catchSignalsFor($life);
-                $lastWill->capture();
-                call_user_func($this->main, $life);
+        while(true) {
+            $attempts += 1;
+            $lastWill = new LastWill($this->options);
+            $pid = pcntl_fork();
+            if ($pid >= 0) {
+                if ($pid) {
+                    pcntl_waitpid($pid, $status);
+                    $lastWill->stop();
+                    list($tryAnotherTime, $result) =
+                        $this->afterChildDeathWithStatus(
+                            $this->exitStatusOfLastChild($status), $attempts, $lastWill
+                        );
+                    if (!$tryAnotherTime) {
+                        return $result;
+                    }
+                } else {
+                    $life = new Life($attempts);
+                    $this->catchSignalsFor($life);
+                    $lastWill->capture();
+                    return call_user_func($this->main, $life);
+                }
             }
         }
     }
@@ -61,11 +69,11 @@ class GracefulDeath
         $lastWill->play();
         if ($status !== 0) {
             if ($this->canTryAnotherTime($status, $attempts, $lastWill)) {
-                return $this->run($attempts + 1);
+                return [true, null];
             }
-            return call_user_func($this->afterViolentDeath, $status);
+            return [false, call_user_func($this->afterViolentDeath, $status)];
         }
-        return call_user_func($this->afterNaturalDeath, $status);
+        return [false, call_user_func($this->afterNaturalDeath, $status)];
     }
 
     private function canTryAnotherTime($status, $attempts, $lastWill)

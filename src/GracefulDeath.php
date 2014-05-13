@@ -79,7 +79,10 @@ class GracefulDeath
         if (is_numeric($this->reanimationPolicy)) {
             return $this->reanimationPolicy >= $lifeCounter;
         }
-        return (bool) $this->reanimationPolicy;
+        if (is_bool($this->reanimationPolicy)) {
+            return $this->reanimationPolicy;
+        }
+        return false;
     }
 
     private function catchAndIgnoreSignals()

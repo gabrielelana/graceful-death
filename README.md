@@ -38,7 +38,7 @@ There are a few other method that can be used to configure `GracefulDeath`
   * An integer: the number of times the code will be executed. The code will not be execute again if either the code terminates without error or the number of executions exceeds the number passed as argument
   * A closure: if the closure returns true the code will be executed again. The closure signature is `function($status, $attempts, $stdout, $stderr)`
     * `$status`: the exit status of the code passed to `GracefulDeath::around`
-    * `$attempts`: how many times the code is executed, starts at `1`
+    * `$attempts`: how many times the code has been executed (think how many previous lives), starts at `1`
     * `$stdout`: what the code passed to `GracefulDeath::around` printed on `stdout`
     * `$stderr`: what the code passed to `GracefulDeath::around` printed on `stderr`
 * `doNotCaptureOutput`: avoid to capture `stdout` and `stderr`. Note that if output is not captured then it could not be given to the `reanimationPolicy` closure
@@ -46,11 +46,14 @@ There are a few other method that can be used to configure `GracefulDeath`
 
 For all the options and methods look at the examples or at the tests :smile:
 
+## Use Cases
+* You have a long running process that leaks memory (see `examples/memory_leak.php`)
+
 ## How Does It Work?
-When `run` is called the process forks, the child process will execute the code passed to `GracefulDeath::around`, the parent process will act as a supervisor of the child. The supervisor will wait until the child death and will act accordingly to the exit status and the given configuration.
+When `run` is called the process forks, the child process will execute the code passed to `GracefulDeath::around`, the parent process will act as a supervisor of the child. The supervisor will wait until the child dies and will act accordingly to the exit status and the given configuration.
 
 ## Gotcha
-It only works on unix platforms. It only works where `pcntl_*` function are available.
+It only works where `pcntl_*` function are available.
 
 ## Self-Promotion
 If you like this project, then consider to:

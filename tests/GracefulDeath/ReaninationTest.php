@@ -47,14 +47,14 @@ class ReanimationTest extends GracefulDeathBaseTest
     public function testCanBeReanimatedWithArbitraryPolicy()
     {
         // It will retry for 2ms
-        $startAt = microtime(true);
+        $startedAt = microtime(true);
         GracefulDeath::around(function() {
-            if (microtime(true) - $startAt < 2000) {
+            if (microtime(true) - $startedAt < 2000) {
                 $this->raiseFatalError();
             }
         })
-        ->reanimationPolicy(function($status, $attempts, $output) use($startAt) {
-            return microtime(true) - $startAt > 2000;
+        ->reanimationPolicy(function($status, $attempts, $output) use($startedAt) {
+            return microtime(true) - $startedAt > 2000;
         })
         ->afterNaturalDeath($this->willBeCalled($this->once()))
         ->afterViolentDeath($this->willBeCalled($this->never()))

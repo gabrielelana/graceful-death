@@ -12,7 +12,7 @@ require __DIR__ . "/../vendor/autoload.php";
 // I will live forever!!!
 // Maybe not... :-(
 
-$startAt = time();
+$startedAt = time();
 GracefulDeath::around(function() {
     echo "I will live forever!!!\n";
     // Let's pretend to do something useful :-)
@@ -22,8 +22,8 @@ GracefulDeath::around(function() {
     // Creating an instance of an unknown class will cause a fatal error
     new UnknownClass();
 })
-->reanimationPolicy(function($status, $attempts, $output) use($startAt) {
-    return (time() - $startAt) < 5;
+->reanimationPolicy(function($status, $attempts, $output) use($startedAt) {
+    return (time() - $startedAt) < 5;
 })
 ->afterViolentDeath("Maybe not... :-(\n")
 ->run();

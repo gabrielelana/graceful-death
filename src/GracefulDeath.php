@@ -33,15 +33,26 @@ class GracefulDeath
         if ($pid >= 0) {
             if ($pid) {
                 pcntl_waitpid($pid, $status);
-                $exitStatusOfLastChild = pcntl_wexitstatus($status);
                 $lastWill->stop();
-                return $this->afterChildDeathWithStatus($exitStatusOfLastChild, $lifeCounter, $lastWill);
+                return $this->afterChildDeathWithStatus(
+                    $this->exitStatusOfLastChild($status), $lifeCounter, $lastWill
+                );
             } else {
                 $lastWill->capture();
                 call_user_func($this->main, $lifeCounter);
                 exit(0);
             }
         }
+    }
+
+    private function exitStatusOfLastChild($status)
+    {
+        $exitStatusOfLastChild = pcntl_wexitstatus($status);
+        $lastChildExitedNormally = pcntl_wifexited($status);
+        if (($exitStatusOfLastChild === 0) && !$lastChildExitedNormally) {
+            $exitStatusOfLastChild = 1;
+        }
+        return $exitStatusOfLastChild;
     }
 
     private function afterChildDeathWithStatus($status, $lifeCounter, $lastWill)

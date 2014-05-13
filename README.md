@@ -34,6 +34,7 @@ There are a few other method that can be used to configure `GracefulDeath`
 * `afterNaturalDeath`: like `afterViolentDeath` but used to configure an handler that will be called only when no errors are triggered
 * `afterDeath`: used to configure an handler (like `afterViolentDeath` and `afterNaturalDeath`) that will be called after the code passed to `GracefulDeath::around` is terminated
 * `reanimationPolicy`: used to configure the reanimation policy aka something that will be used to decide if the code passed to `GracefulDeath::around` should be executed again after a fatal error. The reanimation policy could be
+  * A boolean: if true it will retry forever, if false it will never retry (default)
   * An integer: the number of times the code will be executed. The code will not be execute again if either the code terminates without error or the number of executions exceeds the number passed as argument
   * A closure: if the closure returns true the code will be executed again. The closure signature is `function($status, $lifeCounter, $stdout, $stderr)`
     * `$status`: the exit status of the code passed to `GracefulDeath::around`

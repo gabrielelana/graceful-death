@@ -76,7 +76,10 @@ class GracefulDeath
                 $lastWill->whatDidHeSayOnStderr()
             );
         }
-        return $this->reanimationPolicy >= $lifeCounter;
+        if (is_numeric($this->reanimationPolicy)) {
+            return $this->reanimationPolicy >= $lifeCounter;
+        }
+        return (bool) $this->reanimationPolicy;
     }
 
     private function catchAndIgnoreSignals()

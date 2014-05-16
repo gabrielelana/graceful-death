@@ -1,5 +1,7 @@
 <?php
 
+namespace GracefulDeath;
+
 class LastWill
 {
     private $options;

@@ -1,5 +1,7 @@
 <?php
 
+namespace GracefulDeath;
+
 class Life
 {
     private $counter;

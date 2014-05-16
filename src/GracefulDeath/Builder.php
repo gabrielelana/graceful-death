@@ -1,6 +1,10 @@
 <?php
 
-class GracefulDeathBuilder
+namespace GracefulDeath;
+
+use GracefulDeath;
+
+class Builder
 {
     private $main;
     private $afterViolentDeath;

@@ -1,5 +1,9 @@
 <?php
 
+use GracefulDeath\Builder;
+use GracefulDeath\LastWill;
+use GracefulDeath\Life;
+
 class GracefulDeath
 {
     private $main;
@@ -13,7 +17,7 @@ class GracefulDeath
 
     public static function around($main)
     {
-        return new GracefulDeathBuilder($main);
+        return new Builder($main);
     }
 
     public function __construct($main, $afterNaturalDeath, $afterViolentDeath, $reanimationPolicy, $options)

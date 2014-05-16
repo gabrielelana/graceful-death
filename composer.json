@@ -2,7 +2,7 @@
   "name": "gabrielelana/graceful-death",
   "description": "Library that let you catch fatal errors",
   "type": "library",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "keywords": ["catch", "fatal", "error", "try", "die", "cleanup", "long", "running", "process", "memory", "leak"],
   "homepage": "https://github.com/gabrielelana/graceful-death",
   "license": "MIT",

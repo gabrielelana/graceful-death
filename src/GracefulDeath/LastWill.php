@@ -12,6 +12,8 @@ class LastWill
     private $userSettings;
     private $userSettingsToSave;
 
+    const ENOUGH_FREE_SPACE_IN_BYTES = 1024000;
+
     public function __construct($options)
     {
         $this->options = $options;
@@ -21,6 +23,7 @@ class LastWill
         $this->capturedFromStderr = '';
         $this->userSettings = [];
         $this->userSettingsToSave = ['error_log', 'log_errors', 'display_errors'];
+        $this->ensureItIsPossibleToApply();
         $this->saveUserSettings();
     }
 
@@ -96,6 +99,20 @@ class LastWill
     {
         foreach($this->userSettingsToSave as $key) {
             $this->userSettings[$key] = ini_get($key);
+        }
+    }
+
+    private function ensureItIsPossibleToApply()
+    {
+        if (!$this->options['captureOutput']) return;
+        foreach ([$this->stdoutFilePath, $this->stderrFilePath] as $fileToWrite) {
+            $availableSpaceOnDevice = disk_free_space(dirname($fileToWrite));
+            if ($availableSpaceOnDevice < self::ENOUGH_FREE_SPACE_IN_BYTES) {
+                throw new Exception(
+                    "Unable to capture output, " .
+                    "not enough free space on device for file '$fileToWrite'"
+                );
+            }
         }
     }
 

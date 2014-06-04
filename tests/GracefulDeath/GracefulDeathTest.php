@@ -87,4 +87,16 @@ class GracefulDeathTest extends GracefulDeathBaseTest
 
         $this->assertNull($result);
     }
+
+    public function testAroundClosureTakesLifeToWhichCanAskHowManyLiveYouHaveLived()
+    {
+        GracefulDeath::around(function($life) {
+            if ($life->numberOfPreviousLives() > 1) {
+                $this->raiseFatalError();
+            }
+        })
+        ->afterNaturalDeath($this->willBeCalled($this->once()))
+        ->run();
+    }
+
 }

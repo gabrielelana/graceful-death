@@ -3,14 +3,13 @@
 
 class ReanimationTest extends GracefulDeathBaseTest
 {
-    public function testAroundClosureTakesLifeToWhichCanAskHowManyLiveYouHaveLived()
+    public function testByDefaultItWillNotBeReanimated()
     {
-        GracefulDeath::around(function($life) {
-            if ($life->numberOfPreviousLives() > 1) {
-                $this->raiseFatalError();
-            }
+        GracefulDeath::around(function() {
+            $this->raiseFatalError();
         })
-        ->afterNaturalDeath($this->willBeCalled($this->once()))
+        ->afterNaturalDeath($this->willBeCalled($this->never()))
+        ->afterViolentDeath($this->willBeCalled($this->once()))
         ->run();
     }
 
@@ -22,7 +21,7 @@ class ReanimationTest extends GracefulDeathBaseTest
                 $this->raiseFatalError();
             }
         })
-        ->reanimationPolicy(GracefulDeath::GIVE_ME_ANOTHER_CHANCE)
+        ->reanimationPolicy(1)
         ->afterNaturalDeath($this->willBeCalled($this->once()))
         ->afterViolentDeath($this->willBeCalled($this->never()))
         ->run();

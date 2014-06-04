@@ -17,7 +17,7 @@ class Builder
         $this->main = $main;
         $this->afterViolentDeath = function($status) {};
         $this->afterNaturalDeath = function($status) {};
-        $this->reanimationPolicy = function() {return false;};
+        $this->reanimationPolicy = $this->toReanimationPolicy(0);
         $this->options = [
             'echoOutput' => true,
             'captureOutput' => true,

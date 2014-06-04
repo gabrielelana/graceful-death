@@ -27,13 +27,13 @@ class Builder
 
     public function afterViolentDeath($whatToDo)
     {
-        $this->afterViolentDeath = $this->toClosure($whatToDo);
+        $this->afterViolentDeath = $this->toLastAct($whatToDo);
         return $this;
     }
 
     public function afterNaturalDeath($whatToDo)
     {
-        $this->afterNaturalDeath = $this->toClosure($whatToDo);
+        $this->afterNaturalDeath = $this->toLastAct($whatToDo);
         return $this;
     }
 
@@ -44,8 +44,8 @@ class Builder
 
     public function afterDeath($whatToDo)
     {
-        $this->afterViolentDeath = $this->toClosure($whatToDo);
-        $this->afterNaturalDeath = $this->toClosure($whatToDo);
+        $this->afterViolentDeath = $this->toLastAct($whatToDo);
+        $this->afterNaturalDeath = $this->toLastAct($whatToDo);
         return $this;
     }
 
@@ -90,7 +90,7 @@ class Builder
         )->run();
     }
 
-    private function toClosure($whatToDo)
+    private function toLastAct($whatToDo)
     {
         if (is_integer($whatToDo)) {
             return function() use($whatToDo) { exit($whatToDo); };

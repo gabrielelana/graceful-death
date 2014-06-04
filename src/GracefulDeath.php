@@ -12,9 +12,6 @@ class GracefulDeath
     private $reanimationPolicy;
     private $options;
 
-    const DO_NOT_REANIMATE = 0;
-    const GIVE_ME_ANOTHER_CHANCE = 1;
-
     public static function around($main)
     {
         return new Builder($main);

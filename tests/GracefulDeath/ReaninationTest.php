@@ -13,6 +13,17 @@ class ReanimationTest extends GracefulDeathBaseTest
         ->run();
     }
 
+    public function testDoNotReanimateReanimationPolicy()
+    {
+        GracefulDeath::around(function() {
+            $this->raiseFatalError();
+        })
+        ->doNotReanimate()
+        ->afterNaturalDeath($this->willBeCalled($this->never()))
+        ->afterViolentDeath($this->willBeCalled($this->once()))
+        ->run();
+    }
+
     public function testCanBeReanimatedOneTime()
     {
         GracefulDeath::around(function($life) {
@@ -25,6 +36,21 @@ class ReanimationTest extends GracefulDeathBaseTest
         ->afterNaturalDeath($this->willBeCalled($this->once()))
         ->afterViolentDeath($this->willBeCalled($this->never()))
         ->run();
+    }
+
+    public function testGiveMeAnotherChanceReanimationPolicy()
+    {
+        GracefulDeath::around(function($life) {
+            if ($life->numberOfPreviousLives() === 1) {
+                // It will raise a fatal error only the first execution
+                $this->raiseFatalError();
+            }
+        })
+        ->giveMeAnotherChance()
+        ->afterNaturalDeath($this->willBeCalled($this->once()))
+        ->afterViolentDeath($this->willBeCalled($this->never()))
+        ->run();
+
     }
 
     public function testCanBeReanimatedMoreThanOneTime()
@@ -70,6 +96,21 @@ class ReanimationTest extends GracefulDeathBaseTest
             $this->doSomethingUnharmful();
         })
         ->reanimationPolicy(true)
+        ->afterNaturalDeath($this->willBeCalled($this->once()))
+        ->afterViolentDeath($this->willBeCalled($this->never()))
+        ->run();
+    }
+
+    public function testLiveForeverReanimationPolicy()
+    {
+        // It will retry for ever, but after 3 times it will die naturally
+        GracefulDeath::around(function($life) {
+            if ($life->numberOfPreviousLives() < 3) {
+                exit(5);
+            }
+            $this->doSomethingUnharmful();
+        })
+        ->liveForever()
         ->afterNaturalDeath($this->willBeCalled($this->once()))
         ->afterViolentDeath($this->willBeCalled($this->never()))
         ->run();

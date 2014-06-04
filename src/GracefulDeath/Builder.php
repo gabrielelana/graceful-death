@@ -17,7 +17,7 @@ class Builder
         $this->main = $main;
         $this->afterViolentDeath = function($status) {};
         $this->afterNaturalDeath = function($status) {};
-        $this->reanimationPolicy = $this->toReanimationPolicy(0);
+        $this->reanimationPolicy = $this->toReanimationPolicy(false);
         $this->options = [
             'echoOutput' => true,
             'captureOutput' => true,
@@ -46,6 +46,24 @@ class Builder
     {
         $this->afterViolentDeath = $this->toLastAct($whatToDo);
         $this->afterNaturalDeath = $this->toLastAct($whatToDo);
+        return $this;
+    }
+
+    public function doNotReanimate()
+    {
+        $this->reanimationPolicy = $this->toReanimationPolicy(false);
+        return $this;
+    }
+
+    public function giveMeAnotherChance()
+    {
+        $this->reanimationPolicy = $this->toReanimationPolicy(1);
+        return $this;
+    }
+
+    public function liveForever()
+    {
+        $this->reanimationPolicy = $this->toReanimationPolicy(true);
         return $this;
     }
 

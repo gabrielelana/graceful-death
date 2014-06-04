@@ -45,11 +45,13 @@ There are a few other method that can be used to configure `GracefulDeath`
     * `$stderr`: what the code passed to `GracefulDeath::around` printed on `stderr`
 * `doNotCaptureOutput`: avoid to capture `stdout` and `stderr`. Note that if output is not captured then it could not be given to the `reanimationPolicy` closure
 * `doNotEchoOutput`: discard the (if any) captured output
+* `avoidFutileMedicalCare($numberOfFailures, $inAmountOfTime)`: avoid to reanimate a process that died too many times (`$numberOfFailures` default to 6) in a small amount of time (`$inAmountOfTime` default 60 seconds)
 
 For all the options and methods look at the examples or at the tests :smile:
 
 ## Use Cases
 * You have a long running process that leaks memory (see `examples/memory_leak.php`)
+* You can use `graceful-death` as a [supervisor](http://supervisord.org/), for that use `->liveForever()` to always reanimate the child process and don't forget to use `->avoidFutileMedicalCare()` to avoid to continually reanimate a child process that is broken
 
 ## How Does It Work?
 When `run` is called the process forks, the child process will execute the code passed to `GracefulDeath::around`, the parent process will act as a supervisor of the child. The supervisor will wait until the child dies and will act accordingly to the exit status and the given configuration.

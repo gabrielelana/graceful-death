@@ -17,7 +17,7 @@ class Builder
         $this->main = $main;
         $this->afterViolentDeath = function($status) {};
         $this->afterNaturalDeath = function($status) {};
-        $this->reanimationPolicy = GracefulDeath::DO_NOT_REANIMATE;
+        $this->reanimationPolicy = function() {return false;};
         $this->options = [
             'echoOutput' => true,
             'captureOutput' => true,
@@ -51,7 +51,7 @@ class Builder
 
     public function reanimationPolicy($policy)
     {
-        $this->reanimationPolicy = $policy;
+        $this->reanimationPolicy = $this->toReanimationPolicy($policy);
         return $this;
     }
 
@@ -88,6 +88,21 @@ class Builder
                 $this->options
             )
         )->run();
+    }
+
+    private function toReanimationPolicy($policy)
+    {
+        if (is_integer($policy)) {
+            return function($status, $attempts, $stdout, $stderr) use ($policy) {
+                return $policy >= $attempts;
+            };
+        }
+        if (is_bool($policy)) {
+            return function($status, $attempts, $stdout, $stderr) use ($policy) {
+                return $policy;
+            };
+        }
+        return $policy;
     }
 
     private function toLastAct($whatToDo)

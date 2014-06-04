@@ -82,20 +82,11 @@ class GracefulDeath
 
     private function canTryAnotherTime($status, $attempts, $lastWill)
     {
-        if (is_callable($this->reanimationPolicy)) {
-            return call_user_func($this->reanimationPolicy,
-                $status, $attempts,
-                $lastWill->whatDidHeSayOnStdout(),
-                $lastWill->whatDidHeSayOnStderr()
-            );
-        }
-        if (is_numeric($this->reanimationPolicy)) {
-            return $this->reanimationPolicy >= $attempts;
-        }
-        if (is_bool($this->reanimationPolicy)) {
-            return $this->reanimationPolicy;
-        }
-        return false;
+        return call_user_func($this->reanimationPolicy,
+            $status, $attempts,
+            $lastWill->whatDidHeSayOnStdout(),
+            $lastWill->whatDidHeSayOnStderr()
+        );
     }
 
     private function catchAndIgnoreSignals()

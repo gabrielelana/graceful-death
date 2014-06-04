@@ -99,4 +99,12 @@ class GracefulDeathTest extends GracefulDeathBaseTest
         ->run();
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testBadLastAct()
+    {
+        GracefulDeath::around(function() { })
+            ->afterNaturalDeath(true);
+    }
 }

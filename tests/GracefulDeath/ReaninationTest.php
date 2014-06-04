@@ -115,4 +115,13 @@ class ReanimationTest extends GracefulDeathBaseTest
         ->afterViolentDeath($this->willBeCalled($this->never()))
         ->run();
     }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testBadReanimationPolicy()
+    {
+        GracefulDeath::around(function() { })
+            ->reanimationPolicy('Strings are not convertible to a reanimation policy');
+    }
 }

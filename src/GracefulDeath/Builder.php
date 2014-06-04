@@ -3,6 +3,7 @@
 namespace GracefulDeath;
 
 use GracefulDeath;
+use InvalidArgumentException;
 
 class Builder
 {
@@ -120,7 +121,12 @@ class Builder
                 return $policy;
             };
         }
-        return $policy;
+        if (is_callable($policy)) {
+            return $policy;
+        }
+        throw new InvalidArgumentException(
+            "'{$policy}' could not be converted to a reanimation policy"
+        );
     }
 
     private function toLastAct($whatToDo)
@@ -144,5 +150,8 @@ class Builder
         if (is_callable($whatToDo)) {
             return $whatToDo;
         }
+        throw new InvalidArgumentException(
+            "'{$whatToDo}' could not be converted to an action to be performed after death"
+        );
     }
 }

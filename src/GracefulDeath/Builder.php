@@ -11,6 +11,7 @@ class Builder
     private $afterViolentDeath;
     private $afterNaturalDeath;
     private $reanimationPolicy;
+    private $avoidFutileMedicalCare;
     private $options;
 
     public function __construct($main)
@@ -19,6 +20,9 @@ class Builder
         $this->afterViolentDeath = function($status) {};
         $this->afterNaturalDeath = function($status) {};
         $this->reanimationPolicy = $this->toReanimationPolicy(false);
+        $this->checkIfTerminallyIll = function($reanimationPolicy) {
+            return $reanimationPolicy;
+        };
         $this->options = [
             'echoOutput' => true,
             'captureOutput' => true,
@@ -47,6 +51,24 @@ class Builder
     {
         $this->afterViolentDeath = $this->toLastAct($whatToDo);
         $this->afterNaturalDeath = $this->toLastAct($whatToDo);
+        return $this;
+    }
+
+    public function avoidFutileMedicalCare($numberOfFailures = 6, $inAmountOfTime = 60)
+    {
+        $this->checkIfTerminallyIll = function($reanimationPolicy) use ($numberOfFailures, $inAmountOfTime) {
+            $failuresInTime = [];
+            return function() use (&$failuresInTime, $reanimationPolicy, $numberOfFailures, $inAmountOfTime) {
+                $failuresInTime[] = time();
+                if (count($failuresInTime) > $numberOfFailures) {
+                    $failuresInTime = array_slice($failuresInTime, 1);
+                }
+                if (($failuresInTime[count($failuresInTime)-1] - $failuresInTime[0]) < $inAmountOfTime) {
+                    return false;
+                }
+                return call_user_func_array($reanimationPolicy, func_get_args());
+            };
+        };
         return $this;
     }
 
@@ -98,12 +120,15 @@ class Builder
 
     public function run()
     {
+        $checkIfTerminallyIll = $this->checkIfTerminallyIll;
         return (
             new GracefulDeath(
                 $this->main,
                 $this->afterNaturalDeath,
                 $this->afterViolentDeath,
-                $this->reanimationPolicy,
+                $checkIfTerminallyIll(
+                    $this->reanimationPolicy
+                ),
                 $this->options
             )
         )->run();

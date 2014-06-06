@@ -43,6 +43,7 @@ There are a few other method that can be used to configure `GracefulDeath`
     * `$attempts`: how many times the code has been executed (think how many previous lives), starts at `1`
     * `$stdout`: what the code passed to `GracefulDeath::around` printed on `stdout`
     * `$stderr`: what the code passed to `GracefulDeath::around` printed on `stderr`
+
   There are a few reanimation policies ready to be used
     * `doNotReanimate`: this is the default behaviour so not so useful to use but could be good for documentation or to make the code more explicit
     * `giveMeAnotherChance`: it will reanimate the child process only one time

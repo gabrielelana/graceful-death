@@ -29,14 +29,14 @@ class GracefulDeath
     public function run()
     {
         $attempts = 0;
-        $this->catchAndIgnoreSignals();
         while(true) {
             $attempts += 1;
             $lastWill = new LastWill($this->options);
             $pid = pcntl_fork();
             if ($pid >= 0) {
                 if ($pid) {
-                    pcntl_waitpid($pid, $status);
+                    $this->catchAndForwardSignalTo($pid);
+                    $status = $this->waitUntilProcessDiesAndReturnStatus($pid);
                     $lastWill->stop();
                     list($tryAnotherTime, $result) =
                         $this->afterChildDeathWithStatus(
@@ -86,13 +86,26 @@ class GracefulDeath
         );
     }
 
-    private function catchAndIgnoreSignals()
+    private function catchAndForwardSignalTo($pid)
     {
         foreach ($this->options['catchSignals'] as $signal) {
-            pcntl_signal($signal, function($signal) {
-                // catch but do nothing
+            pcntl_signal($signal, function($signal) use ($pid) {
+                posix_kill($pid, $signal);
             });
         }
+    }
+
+    private function waitUntilProcessDiesAndReturnStatus($pid)
+    {
+        if (!empty($this->options['catchSignals'])) {
+            while (pcntl_waitpid($pid, $status, WNOHANG) <= 0) {
+                pcntl_signal_dispatch();
+                usleep(100000);
+            }
+            return $status;
+        }
+        pcntl_waitpid($pid, $status);
+        return $status;
     }
 
     private function catchSignalsFor($life)

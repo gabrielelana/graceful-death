@@ -2,7 +2,7 @@
   "name": "gabrielelana/graceful-death",
   "description": "Library that let you catch fatal errors",
   "type": "library",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "keywords": ["catch", "fatal", "error", "try", "die", "cleanup", "long", "running", "process", "supervisor"],
   "homepage": "https://github.com/gabrielelana/graceful-death",
   "license": "MIT",
@@ -15,7 +15,8 @@
   },
   "require": {
     "php": ">=5.4.0",
-    "ext-pcntl": "*"
+    "ext-pcntl": "*",
+    "ext-posix": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.0"

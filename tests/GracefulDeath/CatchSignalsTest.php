@@ -30,7 +30,7 @@ class CatchSignalsTest extends GracefulDeathBaseTest
     {
         list($process, $pipes) = $process;
         proc_terminate($process, $signal);
-        usleep(250000); // Need to wait the signal has been dispatched to the supervisor process
+        usleep(500000); // Need to wait the signal has been dispatched to the supervisor process
         $stdout = stream_get_contents($pipes[1]);
         $stderr = stream_get_contents($pipes[2]);
         fclose($pipes[1]);

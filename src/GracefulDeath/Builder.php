@@ -63,8 +63,10 @@ class Builder
                 if (count($failuresInTime) > $numberOfFailures) {
                     $failuresInTime = array_slice($failuresInTime, 1);
                 }
-                if (($failuresInTime[count($failuresInTime)-1] - $failuresInTime[0]) < $inAmountOfTime) {
-                    return false;
+                if (count($failuresInTime) === $numberOfFailures) {
+                    if (($failuresInTime[count($failuresInTime)-1] - $failuresInTime[0]) < $inAmountOfTime) {
+                        return false;
+                    }
                 }
                 return call_user_func_array($reanimationPolicy, func_get_args());
             };

@@ -34,11 +34,6 @@ class LastWill
         $this->redirectStderr();
     }
 
-    private function removeErrorLogHeaderFromEachLine($content)
-    {
-        return preg_replace('/^\[[^\]]+\]\s(.*)$/m', '\1', $content);
-    }
-
     public function stop()
     {
         $this->capturedFromStdout = $this->contentOf($this->stdoutFilePath);
@@ -53,6 +48,16 @@ class LastWill
         $this->playCapturedStdoutOnStdout();
         $this->playCapturedStderrOnStderr();
         $this->playCapturedStderrOnErrorLog();
+    }
+
+    public function whatDidHeSayOnStdout()
+    {
+        return $this->capturedFromStdout;
+    }
+
+    public function whatDidHeSayOnStderr()
+    {
+        return $this->capturedFromStderr;
     }
 
     private function playCapturedStdoutOnStdout()
@@ -78,14 +83,9 @@ class LastWill
         }
     }
 
-    public function whatDidHeSayOnStdout()
+    private function removeErrorLogHeaderFromEachLine($content)
     {
-        return $this->capturedFromStdout;
-    }
-
-    public function whatDidHeSayOnStderr()
-    {
-        return $this->capturedFromStderr;
+        return preg_replace('/^\[[^\]]+\]\s(.*)$/m', '\1', $content);
     }
 
     private function contentOf($filePath)
@@ -93,13 +93,6 @@ class LastWill
         $content = file_get_contents($filePath);
         @unlink($filePath);
         return $content;
-    }
-
-    private function saveUserSettings()
-    {
-        foreach($this->userSettingsToSave as $key) {
-            $this->userSettings[$key] = ini_get($key);
-        }
     }
 
     private function ensureItIsPossibleToApply()
@@ -113,6 +106,13 @@ class LastWill
                     "not enough free space on device for file '$fileToWrite'"
                 );
             }
+        }
+    }
+
+    private function saveUserSettings()
+    {
+        foreach($this->userSettingsToSave as $key) {
+            $this->userSettings[$key] = ini_get($key);
         }
     }
 

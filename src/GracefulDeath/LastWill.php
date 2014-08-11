@@ -29,9 +29,10 @@ class LastWill
 
     public function capture()
     {
-        if (!$this->options['captureOutput']) return;
-        $this->redirectStdout();
-        $this->redirectStderr();
+        if ($this->options['captureOutput']) {
+            $this->redirectStdout();
+            $this->redirectStderr();
+        }
     }
 
     public function stop()
@@ -44,10 +45,11 @@ class LastWill
 
     public function play()
     {
-        if (!$this->options['captureOutput'] || !$this->options['echoOutput']) return;
-        $this->playCapturedStdoutOnStdout();
-        $this->playCapturedStderrOnStderr();
-        $this->playCapturedStderrOnErrorLog();
+        if ($this->options['captureOutput'] && $this->options['echoOutput']) {
+            $this->playCapturedStdoutOnStdout();
+            $this->playCapturedStderrOnStderr();
+            $this->playCapturedStderrOnErrorLog();
+        }
     }
 
     public function whatDidHeSayOnStdout()

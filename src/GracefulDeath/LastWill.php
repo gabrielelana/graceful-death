@@ -44,7 +44,7 @@ class LastWill
 
     public function play()
     {
-        if (!$this->options['echoOutput']) return;
+        if (!$this->options['captureOutput'] || !$this->options['echoOutput']) return;
         $this->playCapturedStdoutOnStdout();
         $this->playCapturedStderrOnStderr();
         $this->playCapturedStderrOnErrorLog();

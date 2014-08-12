@@ -87,7 +87,7 @@ class LastWill
 
     private function removeErrorLogHeaderFromEachLine($content)
     {
-        return preg_replace('/^\[[^\]]+\]\s(.*)$/m', '\1', $content);
+        return preg_replace('/^\[[^\]]+\]\s*/m', '', $content);
     }
 
     private function contentOf($filePath)

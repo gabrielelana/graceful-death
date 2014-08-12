@@ -77,10 +77,10 @@ class LastWill
     private function playCapturedStderrOnErrorLog()
     {
         if ($this->userSettings['log_errors'] && $this->userSettings['error_log']) {
-            $handle = fopen($this->userSettings['error_log'], 'a');
-            if ($handle) {
-                fwrite($handle, $this->capturedFromStderr);
-                fclose($handle);
+            foreach (preg_split('/\s*\n\s*/', $this->capturedFromStderr) as $line) {
+                if (!empty($line)) {
+                    error_log($line);
+                }
             }
         }
     }

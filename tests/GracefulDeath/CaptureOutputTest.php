@@ -28,10 +28,11 @@ class CaptureOutputTest extends GracefulDeathBaseTest
 
     public function testErrorsAreStillLoggedWhenErrorLogIsEnabled()
     {
-        $stderrFilePath = tempnam(sys_get_temp_dir(), 'death');
-        $this->runFixture("printOutputOnErrorLog.php --where {$stderrFilePath}");
-        $this->assertNotEmpty(file_get_contents($stderrFilePath));
-        @unlink($stderrFilePath);
+        $errorLogFilePath = tempnam(sys_get_temp_dir(), 'death');
+        $this->runFixture("printOutputOnErrorLog.php --where {$errorLogFilePath}");
+        $this->assertNotEmpty(file_get_contents($errorLogFilePath));
+        $this->assertLinesAreFormattedAsAnErrorLog(file_get_contents($errorLogFilePath));
+        @unlink($errorLogFilePath);
     }
 
     public function testCouldAvoidToPrintChildOutputWithOption()
@@ -67,5 +68,16 @@ class CaptureOutputTest extends GracefulDeathBaseTest
         })
         ->doNotEchoOutput()
         ->run();
+    }
+
+
+
+    private function assertLinesAreFormattedAsAnErrorLog($string)
+    {
+        foreach (preg_split('/\s*\n\s*/', $string) as $line) {
+            if (!empty($line)) {
+                $this->assertStringMatchesFormat('[%s]%wPHP Notice:%s', $line);
+            }
+        }
     }
 }

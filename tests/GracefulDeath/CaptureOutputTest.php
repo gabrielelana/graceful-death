@@ -76,7 +76,7 @@ class CaptureOutputTest extends GracefulDeathBaseTest
     {
         foreach (preg_split('/\s*\n\s*/', $string) as $line) {
             if (!empty($line)) {
-                $this->assertStringMatchesFormat('[%s]%wPHP Notice:%s', $line);
+                $this->assertStringMatchesFormat('[%s]%wPHP%s', $line);
             }
         }
     }

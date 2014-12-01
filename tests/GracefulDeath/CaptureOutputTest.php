@@ -70,7 +70,17 @@ class CaptureOutputTest extends GracefulDeathBaseTest
         ->run();
     }
 
-
+    public function testChildStandardErrorIsCapturedAndAvailableAfterViolentDeath()
+    {
+        GracefulDeath::around(function() {
+            $this->raiseAndReportFatalError();
+        })
+        ->afterViolentDeath(function($status, $stderr) {
+            $this->assertStringStartsWith('PHP Fatal error:', trim($stderr));
+        })
+        ->doNotEchoOutput()
+        ->run();
+    }
 
     private function assertLinesAreFormattedAsAnErrorLog($string)
     {

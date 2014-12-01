@@ -95,6 +95,19 @@ class CaptureOutputTest extends GracefulDeathBaseTest
         ->run();
     }
 
+    public function testChildStandardOutputIsCapturedAfterNaturalDeath()
+    {
+        GracefulDeath::around(function() {
+            file_put_contents('php://stdout', "This is a notice");
+            $this->doSomethingUnharmful();
+        })
+        ->afterNaturalDeath(function($status, $stdout) {
+            $this->assertEquals("This is a notice", $stdout);
+        })
+        ->doNotEchoOutput()
+        ->run();
+    }
+
     private function assertLinesAreFormattedAsAnErrorLog($string)
     {
         foreach (preg_split('/\s*\n\s*/', $string) as $line) {

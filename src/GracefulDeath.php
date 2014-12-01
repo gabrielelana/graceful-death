@@ -80,7 +80,12 @@ class GracefulDeath
                     $lastWill->whatDidHeSayOnStderr()
                 )];
         }
-        return [false, call_user_func($this->afterNaturalDeath, $status)];
+        return [
+            false, 
+            call_user_func(
+                $this->afterNaturalDeath, $status,
+                $lastWill->whatDidHeSayOnStdout()
+            )];
     }
 
     private function canTryAnotherTime($status, $attempts, $lastWill)

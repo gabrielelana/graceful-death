@@ -30,7 +30,7 @@ GracefulDeath::around(function() {
 You have a piece of code that potentially can trigger a fatal error and you want to be able to clean up after it or retry it with some policy. With `GracefulDeath` you can put this piece of code in a closure and pass it as a parameter to the `GracefulDeath::around` static method. This static method returns an instance of a builder that let you configure how `GracefulDeath` will behave. With `afterViolentDeath` you can configure an handler that will be called whenever a fatal error is triggered. The handler could be
 * An integer: the process will terminate with this integer as status code
 * A string: the string will be printed on standard output (like in this example)
-* A closure: the closure will be executed and its return value will be used as return value of the `run` method. The closure signature is `function($status)` where `$status` is the exit status of the code passed to `GracefulDeath::around`
+* A closure: the closure will be executed and its return value will be used as return value of the `run` method. The closure signature is `function($status, $stdout, $stderr)` where `$status` is the exit status of the code passed to `GracefulDeath::around`
 
 There are a few other method that can be used to configure `GracefulDeath`
 * `afterNaturalDeath`: like `afterViolentDeath` but used to configure an handler that will be called only when no errors are triggered

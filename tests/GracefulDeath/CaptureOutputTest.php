@@ -70,7 +70,43 @@ class CaptureOutputTest extends GracefulDeathBaseTest
         ->run();
     }
 
+    public function testChildStandardErrorIsCapturedAndAvailableAfterViolentDeath()
+    {
+        GracefulDeath::around(function() {
+            $this->raiseAndReportFatalError();
+        })
+        ->afterViolentDeath(function($status, $stdout, $stderr) {
+            $this->assertStringStartsWith('PHP Fatal error:', trim($stderr));
+        })
+        ->doNotEchoOutput()
+        ->run();
+    }
 
+    public function testChildStandardOutputIsCapturedAndAvailableAfterViolentDeath()
+    {
+        GracefulDeath::around(function() {
+            echo "This is a stdout test";
+            $this->raiseAndReportFatalError();
+        })
+        ->afterViolentDeath(function($status, $stdout, $stderr) {
+            $this->assertEquals("This is a stdout test", $stdout);
+        })
+        ->doNotEchoOutput()
+        ->run();
+    }
+
+    public function testChildStandardOutputIsCapturedAfterNaturalDeath()
+    {
+        GracefulDeath::around(function() {
+            file_put_contents('php://stdout', "This is a notice");
+            $this->doSomethingUnharmful();
+        })
+        ->afterNaturalDeath(function($status, $stdout) {
+            $this->assertEquals("This is a notice", $stdout);
+        })
+        ->doNotEchoOutput()
+        ->run();
+    }
 
     private function assertLinesAreFormattedAsAnErrorLog($string)
     {

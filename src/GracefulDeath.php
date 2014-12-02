@@ -72,9 +72,20 @@ class GracefulDeath
             if ($this->canTryAnotherTime($status, $attempts, $lastWill)) {
                 return [true, null];
             }
-            return [false, call_user_func($this->afterViolentDeath, $status)];
+            return [
+                false, 
+                call_user_func(
+                    $this->afterViolentDeath, $status, 
+                    $lastWill->whatDidHeSayOnStdout(),
+                    $lastWill->whatDidHeSayOnStderr()
+                )];
         }
-        return [false, call_user_func($this->afterNaturalDeath, $status)];
+        return [
+            false, 
+            call_user_func(
+                $this->afterNaturalDeath, $status,
+                $lastWill->whatDidHeSayOnStdout()
+            )];
     }
 
     private function canTryAnotherTime($status, $attempts, $lastWill)
